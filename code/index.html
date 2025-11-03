@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HealthyLife Nutrition Hub - Full-Stack Application</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* BASE STYLES & TYPOGRAPHY */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+            transition: background-color 0.3s, color 0.3s, border-color 0.3s; 
+        }
+
+        body {
+            background-color: #f0f4f8; 
+            color: #333;
+            line-height: 1.6;
+        }
+
+        /* --- DARK MODE STYLES (Syllabus: CSS Transitions, Selectors) --- */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #f0f4f8;
+        }
+
+        body.dark-mode header, body.dark-mode footer { background: #0d47a1; }
+        body.dark-mode section { background-color: #2c2c2c; box-shadow: 0 10px 30px rgba(255, 255, 255, 0.05); }
+        body.dark-mode nav { background-color: #1565c0; box-shadow: 0 2px 5px rgba(255, 255, 255, 0.2); }
+        body.dark-mode h2 { color: #90caf9; }
+        body.dark-mode form { background: #333; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5); }
+        body.dark-mode label { color: #90caf9; }
+        body.dark-mode input, body.dark-mode select { background-color: #444; border-color: #555; color: #f0f4f8; }
+        body.dark-mode .result { background: linear-gradient(135deg, #333, #444); border: 1px solid #1e88e5; color: #e3f2fd; }
+
+        /* HEADER & NAVIGATION */
+        header {
+            background: #2e7d32; color: white; text-align: center; padding: 40px 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        header h1 { font-size: 3em; font-family: 'Montserrat', sans-serif; font-weight: 800; }
+        .hero-banner {
+            background-image: url('https://images.pexels.com/photos/1640772/pexels-photo-1640772.jpeg?auto=compress&cs=tinysrgb&dpr=3&h=720&w=1280');
+            background-size: cover; background-position: center; height: 380px; width: 100%; border-bottom: 5px solid #4CAF50;
+        }
+        nav { background-color: #388E3C; text-align: center; padding: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); position: sticky; top: 0; z-index: 100; }
+        nav a { color: white; text-decoration: none; margin: 0 20px; font-weight: 600; transition: color 0.3s; }
+        #theme-toggle { background-color: #f4a261; color: #fff; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: 600; margin-left: 30px; transition: background-color 0.3s, transform 0.2s; }
+        
+        section { padding: 80px 20px; max-width: 1100px; margin: 30px auto; background-color: white; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        h2 { color: #2e7d32; margin-bottom: 30px; text-align: center; font-family: 'Montserrat', sans-serif; font-weight: 700; }
+
+        /* --- NUTRIENT ANALYSIS HUB STYLES --- */
+        #analysis { background: linear-gradient(145deg, #e8f5e9, #dcefe0); padding: 50px; }
+        form {
+            max-width: 480px; padding: 40px; border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15), 0 0 0 5px rgba(76, 175, 80, 0.1);
+            margin: auto; display: flex; flex-direction: column; gap: 15px;
+        }
+
+        .form-group {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 5px 0; position: relative;
+        }
+
+        label {
+            font-weight: 700; color: #1b5e20; flex-basis: 40%; text-align: left; margin-right: 15px;
+        }
+
+        input, select {
+            flex-basis: 60%; padding: 12px; font-size: 1.05em; border: 1px solid #c8e6c9; 
+            border-radius: 8px; transition: all 0.3s ease;
+        }
+
+        /* Input Focus/Validation Improvement (Syllabus: Form Enhancements) */
+        input:focus, select:focus {
+            border-color: #2196F3;
+            box-shadow: 0 0 10px rgba(33, 150, 243, 0.6);
+            outline: none;
+        }
+
+        button {
+            background-color: #4CAF50; color: white; font-weight: 700; padding: 12px; border: none; border-radius: 8px; margin-top: 15px; cursor: pointer;
+        }
+
+        .error-message {
+            color: #D32F2F;
+            font-size: 0.85em;
+            font-weight: 600;
+            position: absolute;
+            bottom: -20px;
+            right: 0;
+            text-align: right;
+            width: 60%;
+            padding-top: 5px;
+        }
+
+        /* Loading Indicator Style */
+        .loading-text {
+            text-align: center;
+            font-size: 1.2em;
+            color: #03a9f4;
+            margin: 20px 0;
+            font-weight: 600;
+        }
+        
+        /* FOOTER */
+        footer { background-color: #333; color: white; padding: 30px; margin-top: 50px; }
+
+        @media (max-width: 768px) {
+            .form-group { flex-direction: column; align-items: flex-start; }
+            label, input, select { flex-basis: 100%; width: 100%; margin-right: 0; text-align: left; }
+            .error-message { right: auto; left: 0; width: 100%; text-align: left; }
+        }
+    </style>
+</head>
+<body id="body">
+
+    <header>
+        <h1>HealthyLife Nutrition Hub</h1>
+        <p>Advanced Diet Balancing & Nutrient Deficit Detection Platform</p>
+    </header>
+    
+    <div class="hero-banner"></div>
+
+    <nav>
+        <a href="#about">About</a>
+        <a href="#analysis">Nutrient Analysis Hub</a>
+        <a href="#recommendations">Personalized Plan</a>
+        <button id="theme-toggle" onclick="NutritionApp.ThemeManager.toggleDarkMode()">🌙 Toggle Dark Mode</button>
+    </nav>
+
+    <section id="about">
+        <h2>About Our Platform</h2>
+        <p>
+            Welcome to **HealthyLife Nutrition Hub** — your intelligent platform for balanced living. We combine the **Mifflin-St Jeor formula** with expert nutritional guidelines to accurately predict your energy needs and generate a **personalized, 7-day meal plan** focused on correcting common **nutrient deficiencies** in children and adolescents.
+        </p>
+    </section>
+
+    <section id="analysis">
+        <h2>1. Nutrient Analysis Hub</h2>
+        <p style="text-align: center; color: #03a9f4; font-weight: 600; margin-bottom: 25px;">
+            **IMPORTANT:** Please use **Kilograms (kg)** for weight and **Centimeters (cm)** for height for accurate calculation.
+        </p>
+        <form id="calorieForm">
+            <div class="form-group">
+                <label for="age">Age (Years):</label>
+                <input type="number" id="age" required min="1" oninput="NutritionApp.Validator.clearError('age')" onkeydown="NutritionApp.InputController.restrictInput(event, false)">
+                <span id="age-error" class="error-message"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="gender">Gender:</label>
+                <select id="gender" required onchange="NutritionApp.Validator.clearError('gender')">
+                    <option value="">Select</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                </select>
+                <span id="gender-error" class="error-message"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="weight">Weight (kg):</label>
+                <input type="number" id="weight" required min="1" step="0.1" oninput="NutritionApp.Validator.clearError('weight')" onkeydown="NutritionApp.InputController.restrictInput(event, true)">
+                <span id="weight-error" class="error-message"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="height">Height (cm):</label>
+                <input type="number" id="height" required min="1" oninput="NutritionApp.Validator.clearError('height')" onkeydown="NutritionApp.InputController.restrictInput(event, false)">
+                <span id="height-error" class="error-message"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="activity">Activity Level:</label>
+                <select id="activity" required onchange="NutritionApp.Validator.clearError('activity')">
+                    <option value="">Select</option>
+                    <option value="1.2">Sedentary (Little or no exercise)</option>
+                    <option value="1.375">Lightly active (1–3 days/week)</option>
+                    <option value="1.55">Moderately active (3–5 days/week)</option>
+                    <option value="1.725">Very active (6–7 days/week)</option>
+                    <option value="1.9">Super active (Twice/day training)</option>
+                </select>
+                <span id="activity-error" class="error-message"></span>
+            </div>
+
+            <button type="button" onclick="NutritionApp.Calculator.calculateCalories()">Generate Personalized Plan</button>
+        </form>
+
+        <div class="result" id="result"></div>
+    </section>
+
+    <section id="recommendations">
+        <h2>2. Personalized Recommendations (7-Day Plan)</h2>
+        <p class="text-center" style="text-align: center; margin-bottom: 30px;">This plan is dynamically generated based on your calculated **Macronutrient Goals** to ensure optimal balance and energy.</p>
+        
+        <div id="dynamic-plan">
+             <table class="meal-plan-table">
+                <thead>
+                    <tr>
+                        <th>Day</th>
+                        <th>Breakfast</th>
+                        <th>Lunch</th>
+                        <th>Dinner</th>
+                        <th>Snack</th>
+                    </tr>
+                </thead>
+                <tbody id="meal-plan-body">
+                    <tr><td colspan="5" style="text-align: center; color: #777; padding: 20px;">**Please use the Nutrient Analysis Hub (Section 1) above to generate your plan.**</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <footer>
+        &copy; 2025 HealthyLife Nutrition Hub | Designed for a Healthier You 🌿
+    </footer>
+
+    <script>
+        // --- MODULAR JAVASCRIPT STRUCTURE (Syllabus: Modular JavaScript, ES6+) ---
+        const NutritionApp = {
+            
+            // --- DATASET ---
+            Meals: { 
+                protein_meals: [
+                    "Greek Yogurt (High Protein) with Berries", "Scrambled Eggs (3) & Whole-Grain Toast", "Tuna Salad (High Omega-3) on Crackers", 
+                    "Lentil or Black Bean Soup", "Grilled Chicken Breast with Quinoa", "Baked Salmon with Sautéed Greens (Iron/D)", 
+                    "Tofu Scramble with Bell Peppers"
+                ],
+                carb_meals: [
+                    "Oatmeal (Fiber) with Banana & Maple Syrup", "Whole-Wheat Toast with Avocado & Tomato", "Brown Rice Bowl with Mixed Vegetables", 
+                    "Sweet Potato Mash with a dash of Cinnamon", "Whole-Grain Pasta Salad with Light Vinaigrette", "Quinoa with Roasted Root Vegetables", 
+                    "Whole-Grain Bagel with light Cream Cheese"
+                ],
+                fat_meals: [
+                    "Handful of Walnuts & Almonds", "1/4 Avocado with sea salt", "Peanut Butter on Apple Slices", 
+                    "Small serving of Cottage Cheese", "Hard-boiled Egg", "Cheese stick and a pear", 
+                    "Olives and a few whole-grain crackers"
+                ]
+            },
+
+            // --- API SIMULATION (Syllabus: Fetch API, Promises, async/await, Node.js Backend simulation) ---
+            API: {
+                fetchMealPlan: function(proteinGoal) {
+                    console.log(`API Call: Requesting meal plan data from simulated backend with protein goal: ${proteinGoal}g...`);
+                    
+                    return new Promise((resolve, reject) => {
+                        // Simulate network latency (2 seconds)
+                        setTimeout(() => {
+                            try {
+                                const mealPlanHtml = NutritionApp.Calculator._generateMealPlanHTML(proteinGoal);
+                                resolve(mealPlanHtml); 
+                            } catch (error) {
+                                reject("Error: The backend server failed to generate the meal plan.");
+                            }
+                        }, 2000); 
+                    });
+                }
+            },
+            
+            // --- THEME MANAGER (Syllabus: localStorage, DOM manipulation) ---
+            ThemeManager: {
+                init: function() {
+                    const savedTheme = localStorage.getItem('theme');
+                    if (savedTheme === 'dark') {
+                        document.body.classList.add('dark-mode');
+                    }
+                },
+                toggleDarkMode: function() {
+                    const isDark = document.body.classList.toggle('dark-mode');
+                    if (isDark) {
+                        localStorage.setItem('theme', 'dark');
+                    } else {
+                        localStorage.setItem('theme', 'light');
+                    }
+                }
+            },
+            
+            // --- INPUT CONTROLLER (Syllabus: Event Handling) ---
+            InputController: {
+                restrictInput: function(event, allowDecimal) {
+                    const allowedKeys = [48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 8, 46, 9, 13, 37, 39, 36, 35];
+                    const keyCode = event.keyCode;
+                    
+                    if (allowedKeys.includes(keyCode) || (event.ctrlKey || event.metaKey)) {
+                        return true;
+                    }
+
+                    if (allowDecimal && (keyCode === 190 || keyCode === 110)) {
+                        if (event.target.value.includes('.') && (keyCode === 190 || keyCode === 110)) {
+                            event.preventDefault();
+                        }
+                        return true;
+                    }
+                    
+                    if (keyCode === 109 || keyCode === 189) {
+                         event.preventDefault();
+                         return false;
+                    }
+
+                    event.preventDefault();
+                    return false;
+                }
+            },
+
+            // --- FORM VALIDATION MODULE (Syllabus: Form Validation, Error Handling, DOM) ---
+            Validator: {
+                validateForm: function() {
+                    let isValid = true;
+                    const fields = ['age', 'gender', 'weight', 'height', 'activity'];
+                    
+                    fields.forEach(field => {
+                        const inputElement = document.getElementById(field);
+                        const errorElement = document.getElementById(`${field}-error`);
+                        let value = inputElement.value.trim();
+
+                        this.clearError(field); 
+
+                        if (!value || value === "") {
+                            errorElement.textContent = "This field is required.";
+                            inputElement.style.borderColor = "#D32F2F"; 
+                            isValid = false;
+                            return;
+                        }
+                        
+                        if ((inputElement.type === 'number' || inputElement.tagName === 'INPUT') && parseFloat(value) <= 0) {
+                            errorElement.textContent = "Value must be positive.";
+                            inputElement.style.borderColor = "#D32F2F";
+                            isValid = false;
+                        }
+                    });
+
+                    return isValid;
+                },
+
+                clearError: function(fieldId) {
+                    document.getElementById(`${fieldId}-error`).textContent = "";
+                    document.getElementById(fieldId).style.borderColor = ""; 
+                }
+            },
+
+            // --- CALCULATOR LOGIC (Syllabus: JavaScript functions, conditional statements, Math) ---
+            Calculator: {
+                _generateMealPlanHTML: function(proteinGoal) {
+                    const days = ["Day 1", "Day 2", "Day 3", "Day 4", "Day 5", "Day 6", "Day 7"];
+                    let html = '';
+
+                    for (let i = 0; i < 7; i++) {
+                        let breakfast = NutritionApp.Meals.protein_meals[i % NutritionApp.Meals.protein_meals.length];
+                        let lunch, dinner;
+                        
+                        if (i % 3 === 0) { 
+                            lunch = NutritionApp.Meals.protein_meals[(i + 1) % NutritionApp.Meals.protein_meals.length] + " & small Carb side";
+                            dinner = NutritionApp.Meals.protein_meals[(i + 2) % NutritionApp.Meals.protein_meals.length] + " & large Veggie side";
+                        } else if (i % 3 === 1) {
+                            lunch = NutritionApp.Meals.carb_meals[(i + 3) % NutritionApp.Meals.carb_meals.length] + " & small Protein side";
+                            dinner = NutritionApp.Meals.carb_meals[(i + 4) % NutritionApp.Meals.carb_meals.length] + " & light Fat source";
+                        } else {
+                            lunch = NutritionApp.Meals.carb_meals[(i + 5) % NutritionApp.Meals.carb_meals.length] + " & half portion Protein";
+                            dinner = NutritionApp.Meals.protein_meals[(i + 6) % NutritionApp.Meals.protein_meals.length] + " & half portion Carb";
+                        }
+
+                        let snack = NutritionApp.Meals.fat_meals[i % NutritionApp.Meals.fat_meals.length];
+
+                        if (proteinGoal > 120) {
+                            dinner = `🥩 ${dinner} (High Protein Focus)`;
+                        }
+
+                        html += `
+                            <tr>
+                                <td>${days[i]}</td>
+                                <td>${breakfast}</td>
+                                <td>${lunch}</td>
+                                <td>${dinner}</td>
+                                <td>${snack}</td>
+                            </tr>
+                        `;
+                    }
+                    return html;
+                },
+                
+                _getBmiStatus: function(bmi) {
+                    if (bmi < 18.5) return { text: "Underweight", color: "#FFC107" }; // Amber/Yellow
+                    if (bmi < 25) return { text: "Healthy Weight", color: "#4CAF50" }; // Green
+                    if (bmi < 30) return { text: "Overweight", color: "#FF9800" }; // Orange
+                    return { text: "Obese", color: "#D32F2F" }; // Red
+                },
+
+                calculateCalories: async function() {
+                    // --- STEP 1: VALIDATE INPUTS ---
+                    if (!NutritionApp.Validator.validateForm()) {
+                        document.getElementById('result').style.display = 'none'; 
+                        return;
+                    }
+
+                    // --- STEP 2: PERFORM CALCULATION (Sync part) ---
+                    const age = parseInt(document.getElementById('age').value);
+                    const gender = document.getElementById('gender').value;
+                    const weight = parseFloat(document.getElementById('weight').value); // kg
+                    const heightCm = parseFloat(document.getElementById('height').value); // cm
+                    const activity = parseFloat(document.getElementById('activity').value);
+                    
+                    // Convert Height from cm to meters
+                    const heightM = heightCm / 100; 
+
+                    // 1. Calculate BMR (Mifflin-St Jeor)
+                    let bmr;
+                    if (gender === 'male') {
+                        bmr = (10 * weight) + (6.25 * heightCm) - (5 * age) + 5;
+                    } else {
+                        bmr = (10 * weight) + (6.25 * heightCm) - (5 * age) - 161;
+                    }
+
+                    // 2. Calculate TDEE and Macros
+                    const dailyCalories = bmr * activity;
+                    const proteinGrams = Math.round((dailyCalories * 0.25) / 4);
+                    const fatGrams = Math.round((dailyCalories * 0.25) / 9);
+                    const carbGrams = Math.round((dailyCalories * 0.50) / 4);
+                    
+                    // 3. Calculate BMI (Body Mass Index)
+                    const bmi = weight / (heightM * heightM);
+                    const roundedBmi = parseFloat(bmi.toFixed(2));
+                    
+                    // 4. Determine BMI Status
+                    const bmiStatus = this._getBmiStatus(roundedBmi);
+
+                    // --- STEP 3: DISPLAY CALCULATION RESULTS (Immediately) ---
+                    this._displayResults(dailyCalories, proteinGrams, carbGrams, fatGrams, age, roundedBmi, bmiStatus);
+
+                    // --- STEP 4: FETCH MEAL PLAN (Async part) ---
+                    const mealPlanBody = document.getElementById('meal-plan-body');
+                    mealPlanBody.innerHTML = '<tr><td colspan="5" class="loading-text">🔄 Loading Personalized Plan from Server...</td></tr>';
+                    
+                    try {
+                        // AWAIT the simulated API call (Syllabus: async/await)
+                        const mealPlanHtml = await NutritionApp.API.fetchMealPlan(proteinGrams);
+                        
+                        // Update the table body with the fetched data
+                        mealPlanBody.innerHTML = mealPlanHtml;
+                    } catch (error) {
+                        // Handle API errors (Syllabus: Error Handling)
+                        console.error("Meal Plan Fetch Error:", error);
+                        mealPlanBody.innerHTML = `<tr><td colspan="5" class="error-message" style="position: static; text-align: center; padding: 20px;">
+                            ❌ ERROR: Could not retrieve plan. Server simulation failed. Please try again.
+                        </td></tr>`;
+                    }
+                },
+
+                _displayResults: function(dailyCalories, proteinGrams, carbGrams, fatGrams, age, bmi, bmiStatus) {
+                    const resultDiv = document.getElementById('result');
+                    resultDiv.style.display = 'block';
+
+                    let warning = '';
+                    let statusColor = bmiStatus.color;
+
+                    if (age >= 4 && age < 18) {
+                        warning = '<p style="color: #D32F2F; font-weight: 700; margin-top: 15px;"><strong>⚠️ Deficiency Focus for Growth:</strong> Ensure focused intake of **Iron, Calcium, and Vitamin D**.</p>';
+                    } else if (age < 4) {
+                         warning = '<p style="color: #D32F2F; font-weight: 700; margin-top: 15px;"><strong>⚠️ Pediatric Nutrition:</strong> Consult a pediatrician or registered dietitian for accurate guidelines.</p>';
+                    }
+
+                    resultDiv.innerHTML = `
+                        <h3>Your Personalized Health Metrics:</h3>
+                        <p style="font-size: 1.1em; margin-bottom: 5px;">
+                            Body Mass Index (BMI): <strong>${bmi}</strong>
+                        </p>
+                        <p style="font-size: 1.2em; color: ${statusColor}; font-weight: 700; margin-bottom: 20px;">
+                            Health Status: ${bmiStatus.text}
+                        </p>
+                        
+                        <hr style="margin: 15px 0; border-color: #eee;">
+                        
+                        <h3>Estimated Daily Nutrition Goals:</h3>
+                        <p>Estimated Daily Calorie Need (TDEE): <strong>${Math.round(dailyCalories)} kcal</strong></p>
+                        
+                        <div class="chart-container">
+                            <p style="font-weight: 600; color: #388E3C; margin-bottom: 10px; margin-top: 15px;">Macronutrient Breakdown (50% Carbs, 25% Protein, 25% Fat):</p>
+                            
+                        </div>
+
+                        <p style="font-size: 1.1em; color: #1b5e20; margin-top: 15px;"><strong>Detailed Breakdown:</strong></p>
+                        <ul>
+                            <li>Protein: <strong>${proteinGrams}g</strong></li>
+                            <li>Carbohydrates: <strong>${carbGrams}g</strong></li>
+                            <li>Fat: <strong>${fatGrams}g</strong></li>
+                        </ul>
+                        ${warning}
+                    `;
+                    document.getElementById('result').scrollIntoView({ behavior: 'smooth' });
+                }
+            },
+            
+            // --- INITIALIZATION ---
+            init: function() {
+                this.ThemeManager.init();
+            }
+        };
+
+        // Call init when the DOM content is fully loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            NutritionApp.init();
+        });
+    </script>
+
+</body>
+</html>
