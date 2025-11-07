@@ -1,2 +1,117 @@
-Context API (Recommended): Create a NutritionContext to hold the global state: isDarkMode, isLoading, resultData (TDEE, Macros, BMI), 
-and the functions to update them. This replaces your global NutritionApp object.
+// src/context/NutritionContext.js
+
+import React, { createContext, useContext, useState, useEffect } from 'react';
+// Integrate the Custom Hook
+import useCalculator from '../hooks/useCalculator'; 
+
+const NutritionContext = createContext();
+
+// Custom hook to easily consume the context
+export const useNutrition = () => useContext(NutritionContext);
+
+export const NutritionProvider = ({ children }) => {
+    // --- Global UI State (needed by Navigation, Header, etc.) ---
+    const [isDarkMode, setIsDarkMode] = useState(false);
+    
+    // --- Global API/Asynchronous State (needed by Form & Table) ---
+    const [isLoading, setIsLoading] = useState(false);
+    const [mealPlan, setMealPlan] = useState(null);
+    const [error, setError] = useState(null);
+
+    // --- Integrate Custom Logic Hook ---
+    // results, calculate, and formErrors are managed by the custom hook
+    const { results, calculate, formErrors } = useCalculator();
+
+    // useEffect: Handles Data Persistence (Theme)
+    useEffect(() => {
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.body.classList.add('dark-mode');
+            setIsDarkMode(true);
+        }
+    }, []);
+
+    // Function to toggle theme, using local storage (Data Persistence rubric)
+    const toggleDarkMode = () => {
+        const newMode = !isDarkMode;
+        setIsDarkMode(newMode);
+        document.body.classList.toggle('dark-mode', newMode);
+        localStorage.setItem('theme', newMode ? 'dark' : 'light'); 
+    };
+
+    const fetchMealPlan = async (proteinGoal) => {
+        setIsLoading(true);
+        setError(null);
+        
+        // --- API Integration (Simulated for this file) ---
+        await new Promise(resolve => setTimeout(resolve, 2000)); 
+        
+        try {
+            // Placeholder: In a real app, this would be an Axios call that returns meal plan data
+            const simulatedMealPlan = `Meal plan generated for ${proteinGoal}g protein.`; 
+            setMealPlan(simulatedMealPlan);
+        } catch (err) {
+            setError("Error fetching meal plan data.");
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    // The value object contains all global states and functions
+    const value = {
+        // UI & Global Functions
+        isDarkMode, toggleDarkMode,
+        isLoading, error,
+        
+        // Calculated Metrics (read from Custom Hook)
+        results, formErrors, calculate,
+        
+        // API Data
+        mealPlan, fetchMealPlan
+    };
+
+    return <NutritionContext.Provider value={value}>{children}</NutritionContext.Provider>;
+};
+
+// src/components/AnalysisHub/NutritionForm.js (Snippet)
+
+import React, { useState } from 'react';
+// Import the custom hook to get access to global state
+import { useNutrition } from '../../context/NutritionContext'; 
+
+const NutritionForm = () => {
+    // Local State: Form data is managed locally to prevent unnecessary global re-renders
+    const [formData, setFormData] = useState({ 
+        age: '', gender: '', weight: '', height: '', activity: ''
+    });
+
+    // Global State Consumption: Destructuring necessary items from Context
+    const { calculate, fetchMealPlan, formErrors } = useNutrition(); 
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        
+        // Use the 'calculate' function provided by the Context (which is from the Custom Hook)
+        const metrics = calculate(formData); 
+        
+        if (metrics) {
+            // Trigger the global API call, passing required data
+            fetchMealPlan(metrics.proteinGrams); 
+        }
+    };
+
+    // ... rest of the component JSX
+};
+
+// src/components/AnalysisHub/ResultDisplay.js (Snippet)
+
+import { useNutrition } from '../../context/NutritionContext'; 
+
+const ResultDisplay = () => {
+    // Easily access the globally managed results state
+    const { results } = useNutrition(); 
+    
+    if (!results) return null; 
+
+    // ... render results ...
+};
