@@ -1,0 +1,2 @@
+Use React Router DOM. Create distinct paths: / or /home, /analysis (where the form is), and /plan (which can display the generated meal plan). 
+Navigation links must be active NavLink components.
