@@ -1,0 +1,3 @@
+Standard Hooks: Use useState for all form inputs (age, weight, etc.). 
+Use useEffect for localStorage checks (Theme) and data fetching (API/Simulation). 
+Custom Hook: Create a reusable useCalculator hook that encapsulates the entire NutritionApp.Calculator logic (BMI, TDEE, Macros)
