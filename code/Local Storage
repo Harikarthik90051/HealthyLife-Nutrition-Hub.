@@ -1,0 +1,43 @@
+// src/context/NutritionContext.js (Snippet)
+
+// ... inside the NutritionProvider component ...
+
+const [isDarkMode, setIsDarkMode] = useState(false); 
+
+// useEffect: Handles reading the saved theme from Local Storage on initial load
+useEffect(() => {
+    // 1. Check if 'theme' preference exists in the browser's local storage
+    const savedTheme = localStorage.getItem('theme');
+    
+    if (savedTheme === 'dark') {
+        // 2. If saved theme is 'dark', apply the dark-mode class to the body
+        document.body.classList.add('dark-mode');
+        // 3. Update the React state to match the saved preference
+        setIsDarkMode(true);
+    }
+    // The dependency array is empty ([]), so this runs only once on mount.
+}, []);
+// src/context/NutritionContext.js (Snippet)
+
+const toggleDarkMode = () => {
+    const newMode = !isDarkMode;
+    setIsDarkMode(newMode);
+    
+    // Toggle the CSS class on the body element
+    document.body.classList.toggle('dark-mode', newMode);
+    
+    // Data Persistence Step: Save the new preference to Local Storage
+    if (newMode) {
+        localStorage.setItem('theme', 'dark');
+    } else {
+        localStorage.setItem('theme', 'light');
+    }
+    // Alternatively, localStorage.setItem('theme', newMode ? 'dark' : 'light');
+};
+
+// ... this function is then exposed via the Context value:
+const value = {
+    isDarkMode, 
+    toggleDarkMode, // Accessible by the ThemeToggle component
+    // ... other state and functions
+};
