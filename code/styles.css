@@ -1,6 +1,60 @@
-body{
-  padding: 25px;
+/* GLOBAL STYLES & TYPOGRAPHY */
+* {
+    margin: 0; padding: 0; box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s; 
 }
-.title {
-	color: #5C6AC4;
+
+body { background-color: #f0f4f8; color: #333; line-height: 1.6; }
+
+/* DARK MODE STYLES (Key for UI/UX & Advanced Features) */
+body.dark-mode { background-color: #1a1a1a; color: #f0f4f8; }
+body.dark-mode header, body.dark-mode footer { background: #0d47a1; }
+body.dark-mode section { background-color: #2c2c2c; box-shadow: 0 10px 30px rgba(255, 255, 255, 0.05); }
+body.dark-mode nav { background-color: #1565c0; box-shadow: 0 2px 5px rgba(255, 255, 255, 0.2); }
+body.dark-mode h2 { color: #90caf9; }
+body.dark-mode form { background: #333; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5); }
+body.dark-mode input, body.dark-mode select { background-color: #444; border-color: #555; color: #f0f4f8; }
+body.dark-mode .result { background: linear-gradient(135deg, #333, #444); border: 1px solid #1e88e5; color: #e3f2fd; }
+
+/* HEADER & NAVIGATION */
+header { background: #2e7d32; color: white; text-align: center; padding: 40px 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+header h1 { font-size: 3em; font-family: 'Montserrat', sans-serif; font-weight: 800; }
+.hero-banner { 
+    background-size: cover; background-position: center; height: 380px; width: 100%; border-bottom: 5px solid #4CAF50;
+    /* NOTE: The background-image URL needs to be handled via React's public folder or assets */
+}
+nav { 
+    background-color: #388E3C; padding: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); 
+    position: sticky; top: 0; z-index: 100; display: flex; justify-content: center; gap: 20px;
+}
+nav a { color: white; text-decoration: none; font-weight: 600; }
+#theme-toggle { background-color: #03a9f4; }
+
+/* MAIN CONTENT SECTIONS */
+section { padding: 80px 20px; max-width: 1100px; margin: 30px auto; background-color: white; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+h2 { color: #2e7d32; margin-bottom: 30px; text-align: center; font-family: 'Montserrat', sans-serif; }
+
+/* FORM STYLES */
+#analysis { background: linear-gradient(145deg, #e8f5e9, #dcefe0); padding: 50px; }
+form { max-width: 480px; padding: 40px; border-radius: 15px; margin: auto; display: flex; flex-direction: column; gap: 15px; }
+.form-group { display: flex; justify-content: space-between; align-items: center; position: relative; }
+label { font-weight: 700; color: #1b5e20; flex-basis: 40%; }
+input, select { flex-basis: 60%; padding: 12px; border: 1px solid #c8e6c9; border-radius: 8px; }
+button { background-color: #4CAF50; color: white; font-weight: 700; padding: 12px; border-radius: 8px; }
+.error-message { color: #D32F2F; font-size: 0.85em; position: absolute; bottom: -20px; right: 0; }
+
+/* RESULTS & TABLE STYLES */
+.result { display: none; margin-top: 40px; padding: 25px; border-radius: 10px; background-color: #e8f5e9; border: 1px solid #4CAF50; }
+.loading-text { text-align: center; color: #03a9f4; }
+.meal-plan-table { width: 100%; border-collapse: collapse; }
+.meal-plan-table th, .meal-plan-table td { padding: 12px; border: 1px solid #ddd; }
+.meal-plan-table thead tr { background-color: #388E3C; color: white; }
+
+/* RESPONSIVENESS (Key for UI/UX) */
+@media (max-width: 768px) {
+    .form-group { flex-direction: column; align-items: flex-start; }
+    label, input, select { flex-basis: 100%; width: 100%; }
+    .error-message { right: auto; left: 0; width: 100%; text-align: left; }
+    nav { flex-direction: column; gap: 10px; } 
 }
