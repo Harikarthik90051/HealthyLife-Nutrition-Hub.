@@ -1,0 +1,81 @@
+import React, { useState } from 'react';
+import { useAuth } from './AuthContext'; // Assumes you have AuthContext.js
+
+// Reusable Input Field Component (optional, but good practice in React)
+const InputField = ({ id, type, placeholder, value, onChange, error }) => (
+    <>
+        <input 
+            type={type} 
+            id={id} 
+            placeholder={placeholder} 
+            value={value} 
+            onChange={(e) => onChange(e.target.value)}
+            required
+        />
+        {/* Style for the inline error message below the input */}
+        {error && <p style={{ color: '#D32F2F', fontSize: '0.8em', textAlign: 'left', marginBottom: '5px' }}>{error}</p>}
+    </>
+);
+
+// --- Login Component ---
+export const LoginPage = ({ onNavigate }) => {
+    // Get the login function from the global authentication context
+    const { login } = useAuth();
+    
+    // State to manage form inputs and UI feedback
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setError('');
+        setLoading(true);
+
+        // Call the simulated login function from AuthContext
+        const result = await login(email, password);
+        setLoading(false);
+
+        if (result.success) {
+            // If successful, navigate to a protected page (e.g., analysis hub)
+            onNavigate('analysis'); 
+        } else {
+            // Display the error message returned by the login logic
+            setError(result.error || 'Login failed. Please check your credentials.');
+        }
+    };
+
+    return (
+        <section id="login" style={{ display: 'block' }}> {/* This section ID is used by CSS */}
+            <div id="login-section"> {/* This inner div is targeted by CSS for layout */}
+                <h2>Member Login</h2>
+                <form onSubmit={handleSubmit}>
+                    <InputField 
+                        id="login-email" 
+                        type="email" 
+                        placeholder="Email Address" 
+                        value={email} 
+                        onChange={setEmail} 
+                    />
+                    <InputField 
+                        id="login-password" 
+                        type="password" 
+                        placeholder="Password" 
+                        value={password} 
+                        onChange={setPassword} 
+                    />
+                    
+                    <button type="submit" disabled={loading}>
+                        {loading ? 'Authenticating...' : 'Log In'}
+                    </button>
+                    
+                    <p style={{ marginTop: '15px', fontSize: '0.9em' }}>
+                        New user? <a href="#" onClick={() => onNavigate('signup')}>Create an Account</a>
+                    </p>
+                    {error && <p style={{ color: '#D32F2F', marginTop: '10px' }}>{error}</p>}
+                </form>
+            </div>
+        </section>
+    );
+};
