@@ -1,3 +1,97 @@
-Standard Hooks: Use useState for all form inputs (age, weight, etc.). 
-Use useEffect for localStorage checks (Theme) and data fetching (API/Simulation). 
-Custom Hook: Create a reusable useCalculator hook that encapsulates the entire NutritionApp.Calculator logic (BMI, TDEE, Macros)
+// src/hooks/useCalculator.js
+
+import { useState } from 'react';
+
+// Core math logic is extracted for maintainability (Mifflin-St Jeor, BMI)
+const calculateCoreMetrics = (age, gender, weight, heightCm, activity) => {
+    // ... [Original BMR, TDEE, Macro, and BMI calculation logic from your script] ...
+    // Note: This logic is complex and promotes advanced hook use.
+    
+    // Example return structure:
+    return {
+        tdee: Math.round(dailyCalories),
+        proteinGrams,
+        bmi: roundedBmi,
+        // ... other metrics
+    };
+};
+
+const useCalculator = () => {
+    // useState: Manages the output state of the calculation
+    const [results, setResults] = useState(null);
+    const [formErrors, setFormErrors] = useState({});
+
+    // Logic to validate form inputs
+    const validateForm = (formData) => {
+        // ... [Original validation logic adapted for React state management] ...
+        // ... checks for required fields, positive numbers, etc.
+    };
+
+    const calculate = (formData) => {
+        if (!validateForm(formData)) {
+            setResults(null);
+            return false;
+        }
+        const metrics = calculateCoreMetrics( /* ...formData values... */ );
+        setResults(metrics);
+        return metrics;
+    };
+
+    return { results, calculate, formErrors }; // Exposing state and functions
+};
+
+export default useCalculator;
+
+// src/context/NutritionContext.js
+
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import useCalculator from '../hooks/useCalculator';
+
+const NutritionContext = createContext();
+
+export const useNutrition = () => useContext(NutritionContext);
+
+export const NutritionProvider = ({ children }) => {
+    // GLOBAL STATES
+    const [isDarkMode, setIsDarkMode] = useState(false); // Manages Theme (UI/UX)
+    const [isLoading, setIsLoading] = useState(false);   // Manages API Integration
+    const [mealPlan, setMealPlan] = useState(null);
+    const [error, setError] = useState(null);
+
+    // INTEGRATE CUSTOM HOOK (Calculated Metrics)
+    const { results, calculate, formErrors } = useCalculator();
+
+    // useEffect: Handles Data Persistence (Theme)
+    useEffect(() => {
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.body.classList.add('dark-mode');
+            setIsDarkMode(true);
+        }
+    }, []);
+
+    const toggleDarkMode = () => {
+        const newMode = !isDarkMode;
+        setIsDarkMode(newMode);
+        document.body.classList.toggle('dark-mode', newMode);
+        localStorage.setItem('theme', newMode ? 'dark' : 'light'); // Data Persistence
+    };
+
+    const fetchMealPlan = async (proteinGoal) => {
+        // ... [API Integration logic using setIsLoading and setError] ...
+    };
+
+    const value = {
+        // Global UI State
+        isDarkMode, toggleDarkMode,
+        isLoading, error,
+        
+        // Calculated/Form State (From Custom Hook)
+        results, formErrors, calculate,
+        
+        // API Data State
+        mealPlan, fetchMealPlan
+    };
+
+    return <NutritionContext.Provider value={value}>{children}</NutritionContext.Provider>;
+};
