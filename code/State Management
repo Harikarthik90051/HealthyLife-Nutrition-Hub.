@@ -1,0 +1,2 @@
+Context API (Recommended): Create a NutritionContext to hold the global state: isDarkMode, isLoading, resultData (TDEE, Macros, BMI), 
+and the functions to update them. This replaces your global NutritionApp object.
