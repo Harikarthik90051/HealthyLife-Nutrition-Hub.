@@ -1,2 +1,127 @@
-Use React Router DOM. Create distinct paths: / or /home, /analysis (where the form is), and /plan (which can display the generated meal plan). 
-Navigation links must be active NavLink components.
+// src/App.js
+
+import React from 'react';
+// 1. Import necessary components from React Router DOM
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'; 
+import { NutritionProvider } from './context/NutritionContext'; 
+
+// Import all required components
+import Header from './components/Layout/Header';
+import Navigation from './components/Layout/Navigation';
+import Footer from './components/Layout/Footer';
+import NutritionForm from './components/AnalysisHub/NutritionForm';
+import ResultDisplay from './components/AnalysisHub/ResultDisplay';
+import MealPlanTable from './components/MealPlan/MealPlanTable'; 
+import About from './components/Pages/About'; // New simple page component
+
+function App() {
+  return (
+    // Wrap the entire application in the Router and Context Provider
+    <NutritionProvider>
+      <Router> 
+        <Header /> 
+        <Navigation /> {/* The responsive nav bar */}
+        
+        {/* 2. Define Routes for Clear Structure */}
+        <main>
+          <Routes>
+            <Route path="/" element={<About />} /> {/* Home/About Page */}
+            
+            <Route path="/analysis" element={ // The main functional hub
+              <section id="analysis">
+                <h2 style={{textAlign: 'center'}}>1. Nutrient Analysis Hub</h2>
+                <NutritionForm />
+                <ResultDisplay />
+              </section>
+            } />
+            
+            <Route path="/recommendations" element={ // The meal plan display
+              <section id="recommendations">
+                <h2>2. Personalized Recommendations (7-Day Plan)</h2>
+                <MealPlanTable />
+              </section>
+            } />
+          </Routes>
+        </main>
+        
+        <Footer />
+      </Router>
+    </NutritionProvider>
+  );
+}
+
+export default App;
+
+// src/components/Layout/Navigation.js
+
+import React from 'react';
+// 1. Import Link and NavLink for client-side routing
+import { NavLink } from 'react-router-dom'; 
+import ThemeToggle from '../Utilities/ThemeToggle';
+// Import useNutrition to check if user has results (optional but good UX)
+import { useNutrition } from '../../context/NutritionContext'; 
+
+const Navigation = () => {
+    const { results } = useNutrition();
+
+    return (
+        <nav>
+            {/* NavLink is preferred as it adds an 'active' class for styling */}
+            <NavLink to="/" className={({ isActive }) => isActive ? "active-link" : ""}>
+                About
+            </NavLink>
+            
+            <NavLink to="/analysis" className={({ isActive }) => isActive ? "active-link" : ""}>
+                Nutrient Analysis Hub
+            </NavLink>
+            
+            {/* Optional: Disable or style the Recommendations link if results are missing */}
+            <NavLink 
+                to="/recommendations" 
+                className={({ isActive }) => isActive ? "active-link" : (results ? "" : "disabled-link")}
+                aria-disabled={!results}
+            >
+                Personalized Plan
+            </NavLink>
+            
+            <ThemeToggle /> {/* Reusable Component for Dark Mode */}
+        </nav>
+    );
+};
+
+export default Navigation;
+
+/* Add this to your main CSS file (e.g., src/styles/global.css) */
+
+nav {
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    gap: 20px;
+    /* ... existing background, padding, etc. */
+}
+
+/* Style for the active link (clear routing structure) */
+.active-link {
+    font-weight: 800 !important;
+    color: #f4a261 !important; /* Example contrast color */
+    border-bottom: 3px solid #f4a261;
+    padding-bottom: 5px;
+}
+
+/* Style for links without results (good UX) */
+.disabled-link {
+    opacity: 0.6;
+    cursor: not-allowed;
+    pointer-events: none; /* Prevents navigation */
+}
+
+/* Media query for responsiveness */
+@media (max-width: 768px) {
+    nav { 
+        flex-direction: column; 
+        gap: 10px; 
+        padding: 10px;
+    } 
+    nav a { margin: 0; }
+}
