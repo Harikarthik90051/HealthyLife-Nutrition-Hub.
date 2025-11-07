@@ -1,0 +1,9 @@
+Components to Create: 1. App.js (Root), 
+2. Layout.js (for Nav/Footer),
+3. Header,
+4. Navigation,
+5. NutritionForm,
+6. ResultDisplay, 
+7. MealPlanTable,
+8. ThemeToggle. 
+Folder Structure: Organize under src/components/
