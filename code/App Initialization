@@ -1,0 +1,40 @@
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { NutritionProvider } from './context/NutritionContext'; 
+import Navigation from './components/Layout/Navigation';
+import Footer from './components/Layout/Footer';
+import NutritionForm from './components/AnalysisHub/NutritionForm';
+import ResultDisplay from './components/AnalysisHub/ResultDisplay';
+import MealPlanTable from './components/MealPlan/MealPlanTable'; 
+// Assume Home and About are simple pages
+import Home from './components/Pages/Home'; 
+import About from './components/Pages/About'; 
+
+function App() {
+  return (
+    <NutritionProvider>
+      <Router>
+        <Navigation /> 
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/analysis" element={
+            <section id="analysis">
+              <NutritionForm />
+              <ResultDisplay />
+            </section>
+          } />
+          <Route path="/plan" element={
+            <section id="recommendations">
+              <h2>Personalized Recommendations</h2>
+              <MealPlanTable />
+            </section>
+          } />
+        </Routes>
+        <Footer />
+      </Router>
+    </NutritionProvider>
+  );
+}
+
+export default App;
