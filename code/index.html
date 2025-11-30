@@ -1,866 +1,2000 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>HealthyLife Nutrition Hub - Combined Code</title>
-    
-    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
-    
-    <style>
-        body {
-            margin: 0;
-            font-family: 'Roboto', sans-serif;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-            background-color: #f5f5f5;
-            color: #333;
-        }
-        * {
-            box-sizing: border-box;
-        }
-        h1, h2, h3 {
-            color: #2e7d32;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        button, input[type="submit"] {
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px 15px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-            font-size: 1.1em;
-        }
-        button:hover:not(:disabled) {
-            background-color: #388E3C;
-        }
-        button:disabled {
-            background-color: #A5D6A7;
-            cursor: not-allowed;
-        }
-        input, select {
-            padding: 10px;
-            margin: 8px 0;
-            display: inline-block;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
-            width: 100%; /* Ensure inputs fill container width */
-        }
-        a {
-            color: #f4a261;
-            text-decoration: none;
-        }
-        a:hover {
-            text-decoration: underline;
-        }
-    </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Smart Nutrition Advisor – Personalized Diet Planning & Nutrient Deficiency Detection</title>
+
+  <!-- React & Babel -->
+  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <!-- Fonts -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght`C@600;800&family=Roboto:wght@300;400;700&display=swap"
+    rel="stylesheet"
+  />
+
+  <!-- Global Styles -->
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Roboto', sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      background-color: rgb(245, 247, 248);
+      color: dimgray;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    h1, h2, h3 {
+      color: rgb(58, 221, 110);
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    button,
+    input[type="submit"] {
+      background-color: rgb(18, 174, 148);
+      color: white;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color .3s;
+      font-size: 1.05em;
+    }
+
+    button:hover:not(:disabled) {
+      background-color: forestgreen;
+    }
+
+    button:disabled {
+      background-color: lightgreen;
+      cursor: not-allowed;
+    }
+
+    input,
+    select {
+      padding: 10px;
+      margin: 8px 0;
+      border: 1px solid lightgray;
+      border-radius: 4px;
+      width: 100%;
+    }
+
+    a {
+      color: orange;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .card {
+      border-radius: 10px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+      background: white;
+    }
+  </style>
 </head>
 <body>
-    <noscript>You need to enable JavaScript to run this app.</noscript>
-    
-    <div id="root"></div>
+  <noscript>You need to enable JavaScript to run this app.</noscript>
+  <div id="root"></div>
 
-    <script type="text/babel">
-        const { createContext, useState, useEffect, useContext, useCallback } = React;
-        const root = ReactDOM.createRoot(document.getElementById('root'));
+  <!-- Main React Code -->
+  <script type="text/babel">
+    const {
+      createContext,
+      useState,
+      useEffect,
+      useContext,
+      useCallback
+    } = React;
 
-        // =======================================================
-        // A. AuthContext.js (Authentication & Admin Logic)
-        // =======================================================
-        
-        const AuthContext = createContext();
-        const useAuth = () => useContext(AuthContext);
+    const root = ReactDOM.createRoot(document.getElementById('root'));
 
-        const ADMIN_EMAIL = 'harikarthik4351@gmail.com'; 
-        const SIMULATED_OTP = '123456';
-        const ADMIN_STORAGE_KEY = 'adminMetrics'; 
+    // =========================================================
+    // 1. AUTHENTICATION CONTEXT (LOGIN / SIGNUP / ADMIN)
+    // =========================================================
 
-        const updateAdminMetrics = (user, type) => {
-            try {
-                const stored = localStorage.getItem(ADMIN_STORAGE_KEY);
-                let metrics = stored ? JSON.parse(stored) : { signupCount: 0, userList: [] };
+    const AuthContext = createContext();
+    const useAuth = () => useContext(AuthContext);
 
-                if (type === 'signup') {
-                    if (!metrics.userList.find(u => u.email === user.email)) {
-                        metrics.signupCount += 1;
-                        metrics.userList.push({ email: user.email, name: user.name, role: user.role });
-                    }
-                }
-                localStorage.setItem(ADMIN_STORAGE_KEY, JSON.stringify(metrics));
-            } catch (e) {
-                console.error("Failed to update admin metrics:", e);
-            }
-        };
+    // Admin credentials (demo only)
+    const ADMIN_EMAIL = 'harikarthik4351@gmail.com';
+    const ADMIN_PASSWORD = 'Admin@123';
+    const ADMIN_STORAGE_KEY = 'adminMetrics';
 
-        const getAdminMetrics = () => {
-            try {
-                const stored = localStorage.getItem(ADMIN_STORAGE_KEY);
-                return stored ? JSON.parse(stored) : { signupCount: 0, userList: [] };
-            } catch (e) {
-                console.error("Error reading admin metrics from localStorage:", e);
-                return { signupCount: 0, userList: [] };
-            }
-        };
+    // Save signup info in localStorage (simulated DB)
+    const updateAdminMetrics = (user, type) => {
+      try {
+        const stored = localStorage.getItem(ADMIN_STORAGE_KEY);
+        let metrics = stored
+          ? JSON.parse(stored)
+          : { signupCount: 0, userList: [] };
 
-        const AuthProvider = ({ children }) => {
-            const [currentUser, setCurrentUser] = useState(null);
-            const [isLoading, setIsLoading] = useState(true);
-
-            useEffect(() => {
-                const savedUser = localStorage.getItem('currentUser');
-                if (savedUser) {
-                    try {
-                        setCurrentUser(JSON.parse(savedUser));
-                    } catch (e) {
-                        localStorage.removeItem('currentUser');
-                    }
-                }
-                setIsLoading(false);
-            }, []);
-            
-            const login = (email, password, otp = null) => {
-                return new Promise((resolve) => {
-                    setTimeout(() => {
-                        const lowerEmail = email.toLowerCase();
-                        
-                        if (lowerEmail === ADMIN_EMAIL) {
-                            if (otp === null) {
-                                resolve({ success: true, requiresOtp: true, message: `Simulated OTP (${SIMULATED_OTP}) sent to ${ADMIN_EMAIL}.` });
-                                return;
-                            } 
-                            
-                            if (otp === SIMULATED_OTP) {
-                                const user = { email, name: 'Admin', role: 'admin' };
-                                localStorage.setItem('currentUser', JSON.stringify(user));
-                                setCurrentUser(user);
-                                resolve({ success: true, user });
-                            } else {
-                                resolve({ success: false, requiresOtp: true, error: 'Invalid OTP.' });
-                            }
-                        } 
-                        
-                        else if (email && password && password.length >= 6) {
-                            const user = { email, name: email.split('@')[0], role: 'user' };
-                            
-                            localStorage.setItem('currentUser', JSON.stringify(user));
-                            setCurrentUser(user);
-                            resolve({ success: true, user });
-                        } else {
-                            resolve({ success: false, error: 'Invalid credentials or password too short (min 6 chars).' });
-                        }
-                    }, 1000);
-                });
-            };
-            
-            const signup = (email, password, name) => {
-                return new Promise((resolve) => {
-                    if (password.length < 6) {
-                        return resolve({ success: false, error: 'Password must be at least 6 characters.' });
-                    }
-                    if (email.toLowerCase() === ADMIN_EMAIL) {
-                        return resolve({ success: false, error: 'The admin email is reserved for OTP login only.' });
-                    }
-
-                    setTimeout(() => {
-                        const user = { email, name: name || email.split('@')[0], role: 'user' }; 
-                        updateAdminMetrics(user, 'signup');
-                        localStorage.setItem('currentUser', JSON.stringify(user));
-                        setCurrentUser(user);
-                        resolve({ success: true, user });
-                    }, 1000);
-                });
-            };
-
-            const logout = () => {
-                localStorage.removeItem('currentUser');
-                setCurrentUser(null);
-            };
-            
-            const resetAdminMetrics = () => {
-                localStorage.removeItem(ADMIN_STORAGE_KEY);
-            };
-
-            const value = {
-                currentUser,
-                isLoading,
-                login,
-                signup,
-                logout,
-                isAuthenticated: !!currentUser,
-                getAdminMetrics,
-                resetAdminMetrics,
-                adminEmail: ADMIN_EMAIL 
-            };
-
-            return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-        };
-
-        // =======================================================
-        // B. AuthPages.js (Login and Signup Forms)
-        // =======================================================
-
-        const InputField = ({ id, type, placeholder, value, onChange, error }) => (
-            <>
-                <input 
-                    type={type} 
-                    id={id} 
-                    placeholder={placeholder} 
-                    value={value} 
-                    onChange={(e) => onChange(e.target.value)}
-                    required
-                />
-                {error && <p style={{ color: '#D32F2F', fontSize: '0.8em', textAlign: 'left', marginBottom: '5px' }}>{error}</p>}
-            </>
-        );
-
-        const LoginPage = ({ onNavigate }) => {
-            const { login, adminEmail } = useAuth();
-            const [email, setEmail] = useState('');
-            const [password, setPassword] = useState('');
-            const [otp, setOtp] = useState('');
-            const [error, setError] = useState('');
-            const [loading, setLoading] = useState(false);
-            const [requiresOtp, setRequiresOtp] = useState(false);
-            const [otpMessage, setOtpMessage] = useState('');
-            
-            const isSpecialAdmin = email.toLowerCase() === adminEmail;
-            
-            const handleSubmit = async (e) => {
-                e.preventDefault();
-                setError('');
-                setLoading(true);
-                
-                let result;
-                
-                if (isSpecialAdmin) {
-                    if (!requiresOtp) {
-                        result = await login(email, null); 
-                    } else {
-                        result = await login(email, null, otp); 
-                    }
-                } else {
-                    result = await login(email, password);
-                }
-
-                setLoading(false);
-
-                if (result.success) {
-                    if (result.requiresOtp) {
-                        setRequiresOtp(true);
-                        setOtpMessage(result.message);
-                        setPassword(''); 
-                        setOtp('');
-                    } else {
-                        onNavigate(result.user.role === 'admin' ? 'admin' : 'analysis'); 
-                    }
-                } else {
-                    setError(result.error);
-                    if (result.requiresOtp) { 
-                        setRequiresOtp(true); 
-                    } else {
-                        setRequiresOtp(false);
-                    }
-                }
-            };
-
-            return (
-                <section id="login" style={{ display: 'block', maxWidth: '400px', margin: '50px auto' }}>
-                    <div id="login-section" style={{ padding: '50px 30px', borderRadius: '12px', boxShadow: '0 10px 30px rgba(0,0,0,0.1)', background: '#fdfdfd' }}>
-                        <h2>Member Login</h2>
-                        <form onSubmit={handleSubmit}>
-                            
-                            <InputField 
-                                id="login-email" 
-                                type="email" 
-                                placeholder="Email Address" 
-                                value={email} 
-                                onChange={(val) => {
-                                    setEmail(val);
-                                    setRequiresOtp(false); 
-                                }} 
-                            />
-                            
-                            {!isSpecialAdmin && (
-                                <InputField 
-                                    id="login-password" 
-                                    type="password" 
-                                    placeholder="Password" 
-                                    value={password} 
-                                    onChange={setPassword} 
-                                />
-                            )}
-                            
-                            {isSpecialAdmin && requiresOtp && (
-                                <>
-                                    <p style={{ color: '#1b5e20', fontSize: '0.9em', marginBottom: '10px' }}>
-                                        {otpMessage}
-                                    </p>
-                                    <InputField 
-                                        id="login-otp" 
-                                        type="text" 
-                                        placeholder="Enter 6-digit OTP" 
-                                        value={otp} 
-                                        onChange={setOtp} 
-                                    />
-                                </>
-                            )}
-
-                            <button type="submit" disabled={loading} style={{ width: '100%', marginTop: '10px', padding: '15px', backgroundColor: '#f4a261' }}>
-                                {loading 
-                                    ? (isSpecialAdmin && !requiresOtp ? 'Sending OTP...' : 'Authenticating...')
-                                    : (isSpecialAdmin && !requiresOtp ? 'Send OTP' : 'Log In')
-                                }
-                            </button>
-                            <p style={{ marginTop: '15px', fontSize: '0.9em' }}>New user? <a href="#" onClick={() => onNavigate('signup')}>Create an Account</a></p>
-                            {error && <p style={{ color: '#D32F2F', marginTop: '10px' }}>{error}</p>}
-                        </form>
-                    </div>
-                </section>
-            );
-        };
-
-        const SignupPage = ({ onNavigate }) => {
-            const { signup } = useAuth();
-            const [name, setName] = useState('');
-            const [email, setEmail] = useState('');
-            const [password, setPassword] = useState('');
-            const [error, setError] = useState('');
-            const [loading, setLoading] = useState(false);
-
-            const handleSubmit = async (e) => {
-                e.preventDefault();
-                setError('');
-                setLoading(true);
-
-                const result = await signup(email, password, name);
-                setLoading(false);
-
-                if (result.success) {
-                    onNavigate('analysis');
-                } else {
-                    setError(result.error);
-                }
-            };
-
-            return (
-                <section id="signup" style={{ display: 'block', maxWidth: '400px', margin: '50px auto' }}>
-                    <div id="signup-section" style={{ padding: '50px 30px', borderRadius: '12px', boxShadow: '0 10px 30px rgba(0,0,0,0.1)', background: '#fdfdfd' }}>
-                        <h2>Create Account</h2>
-                        <form onSubmit={handleSubmit}>
-                            <InputField id="signup-name" type="text" placeholder="Full Name" value={name} onChange={setName} />
-                            <InputField id="signup-email" type="email" placeholder="Email Address" value={email} onChange={setEmail} />
-                            <InputField id="signup-password" type="password" placeholder="Choose Password (min 6 chars)" value={password} onChange={setPassword} />
-                            <button type="submit" disabled={loading} style={{ width: '100%', marginTop: '10px', padding: '15px', backgroundColor: '#f4a261' }}>
-                                {loading ? 'Creating...' : 'Sign Up'}
-                            </button>
-                            <p style={{ marginTop: '15px', fontSize: '0.9em' }}>Already have an account? <a href="#" onClick={() => onNavigate('login')}>Log In</a></p>
-                            {error && <p style={{ color: '#D32F2F', marginTop: '10px' }}>{error}</p>}
-                        </form>
-                    </div>
-                </section>
-            );
-        };
-
-        // =======================================================
-        // C. AdminDashboard.js (Admin Panel Component)
-        // =======================================================
-        
-        const AdminDashboard = () => {
-            const { currentUser, getAdminMetrics, resetAdminMetrics } = useAuth();
-            const [metrics, setMetrics] = useState({ signupCount: 0, userList: [] });
-            
-            const reloadMetrics = useCallback(() => {
-                setMetrics(getAdminMetrics());
-            }, []);
-
-            useEffect(() => {
-                reloadMetrics();
-            }, [reloadMetrics]);
-
-            if (!currentUser || currentUser.role !== 'admin') {
-                return <p style={{ color: '#D32F2F', textAlign: 'center', padding: '50px' }}>Access Denied. You must be an administrator to view this page.</p>;
-            }
-
-            const handleResetCount = () => {
-                if (window.confirm("Are you sure you want to reset the signup count? This will erase all simulated user data!")) {
-                    resetAdminMetrics();
-                    reloadMetrics(); 
-                    alert("All user data and signup count reset successfully! (Simulated)");
-                }
-            };
-            
-            const tableHeaderStyle = { padding: '10px', border: '1px solid #ccc', backgroundColor: '#388E3C', color: 'white' };
-            const tableCellStyle = { padding: '10px', border: '1px solid #ddd' };
-
-            return (
-                <section id="admin-dashboard" style={{ padding: '80px 20px', maxWidth: '1100px', margin: '30px auto', backgroundColor: 'white', borderRadius: '12px', boxShadow: '0 10px 30px rgba(0,0,0,0.05)' }}>
-                    <h2>👑 Admin Control Panel</h2>
-                    <p style={{ textAlign: 'center', marginBottom: '40px', color: '#1b5e20', fontWeight: 'bold' }}>
-                        Welcome, Admin. You have full administrative control.
-                    </p>
-
-                    <div style={{ display: 'flex', justifyContent: 'space-around', flexWrap: 'wrap', gap: '20px', marginBottom: '40px' }}>
-                        <div style={{ padding: '20px', border: '1px solid #ccc', borderRadius: '8px', textAlign: 'center', minWidth: '200px', backgroundColor: '#e8f5e9' }}>
-                            <h3>Total Signups</h3>
-                            <p style={{ fontSize: '2.5em', fontWeight: 'bold', color: '#2e7d32' }}>{metrics.signupCount}</p>
-                            <button onClick={handleResetCount} style={{ backgroundColor: '#D32F2F', marginTop: '10px', padding: '5px 10px', fontSize: '0.8em' }}>Reset All User Data</button>
-                        </div>
-                    </div>
-
-                    <h3>Registered Users ({metrics.userList.length} total)</h3>
-                    <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '15px' }}>
-                        <thead>
-                            <tr>
-                                <th style={tableHeaderStyle}>ID</th>
-                                <th style={tableHeaderStyle}>Name</th>
-                                <th style={tableHeaderStyle}>Email</th>
-                                <th style={tableHeaderStyle}>Role</th>
-                                <th style={tableHeaderStyle}>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {metrics.userList.map((user, index) => (
-                                <tr key={index}>
-                                    <td style={tableCellStyle}>{index + 1}</td>
-                                    <td style={tableCellStyle}>{user.name}</td>
-                                    <td style={tableCellStyle}>{user.email}</td>
-                                    <td style={tableCellStyle}>{user.role}</td>
-                                    <td style={tableCellStyle}>
-                                        <button style={{ backgroundColor: '#FF9800', padding: '5px 10px', marginRight: '5px', fontSize: '0.9em' }}>Edit (Sim.)</button>
-                                        <button style={{ backgroundColor: '#D32F2F', padding: '5px 10px', fontSize: '0.9em' }}>Delete (Sim.)</button>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </section>
-            );
-        };
-
-
-        // =======================================================
-        // D. Calculator.js (Nutrient Analysis and Meal Plan Logic)
-        // =======================================================
-
-        const Meals = { 
-            protein_meals: ["Greek Yogurt", "Scrambled Eggs", "Tuna Salad", "Lentil Soup", "Grilled Chicken", "Baked Salmon", "Tofu Scramble"],
-            carb_meals: ["Oatmeal", "Whole-Wheat Toast", "Brown Rice Bowl", "Sweet Potato Mash", "Whole-Grain Pasta", "Quinoa Salad", "Whole-Grain Bagel"],
-            fat_meals: ["Handful of Walnuts", "1/4 Avocado", "Peanut Butter on Apple", "Cottage Cheese", "Hard-boiled Egg", "Cheese stick", "Olives"]
-        };
-
-        const getBmiStatus = (bmi) => {
-            if (bmi < 18.5) return { text: "Underweight", color: "#FFC107" }; 
-            if (bmi < 25) return { text: "Healthy Weight", color: "#4CAF50" }; 
-            if (bmi < 30) return { text: "Overweight", color: "#FF9800" }; 
-            return { text: "Obese", color: "#D32F2F" }; 
-        };
-
-        const useMealPlanGenerator = () => {
-            return useCallback((proteinGoal) => {
-                const days = ["Day 1", "Day 2", "Day 3", "Day 4", "Day 5", "Day 6", "Day 7"];
-                return days.map((day, i) => {
-                    let breakfast = Meals.protein_meals[i % Meals.protein_meals.length];
-                    let lunch, dinner;
-                    
-                    if (i % 3 === 0) { 
-                        lunch = Meals.protein_meals[(i + 1) % Meals.protein_meals.length] + " & small Carb side";
-                        dinner = Meals.protein_meals[(i + 2) % Meals.protein_meals.length] + " & large Veggie side";
-                    } else if (i % 3 === 1) {
-                        lunch = Meals.carb_meals[(i + 3) % Meals.carb_meals.length] + " & small Protein side";
-                        dinner = Meals.carb_meals[(i + 4) % Meals.carb_meals.length] + " & light Fat source";
-                    } else {
-                        lunch = Meals.carb_meals[(i + 5) % Meals.carb_meals.length] + " & half portion Protein";
-                        dinner = Meals.protein_meals[(i + 6) % Meals.protein_meals.length] + " & half portion Carb";
-                    }
-
-                    let snack = Meals.fat_meals[i % Meals.fat_meals.length];
-
-                    if (proteinGoal > 120) {
-                        dinner = `🥩 ${dinner} (High Protein Focus)`;
-                    }
-
-                    return { day, breakfast, lunch, dinner, snack };
-                });
-            }, []);
-        };
-
-        const AnalysisResults = ({ metrics }) => {
-            if (!metrics) return null;
-
-            const { dailyCalories, proteinGrams, carbGrams, fatGrams, bmi, bmiStatus, age, proteinPercent, carbPercent, fatPercent } = metrics;
-            
-            const proteinEnd = proteinPercent;
-            const carbStart = proteinEnd;
-            const carbEnd = carbStart + carbPercent;
-            const fatStart = carbEnd;
-
-            const pieChartStyle = {
-                background: `conic-gradient(
-                    #f44336 0% ${proteinEnd}%,
-                    #2196F3 ${carbStart}% ${carbEnd}%,
-                    #FFC107 ${fatStart}% 100%
-                )`,
-                width: '120px',
-                height: '120px',
-                borderRadius: '50%',
-                transition: 'all 0.5s ease',
-            };
-
-            const warning = (age >= 4 && age < 18) 
-                ? <p style={{ color: '#D32F2F', fontWeight: 700, marginTop: '15px' }}><strong>⚠️ Deficiency Focus for Growth:</strong> Ensure focused intake of **Iron, Calcium, and Vitamin D**.</p>
-                : null;
-
-            return (
-                <div className="result" style={{ display: 'block', marginTop: '30px', padding: '20px', border: '1px solid #ccc', borderRadius: '8px' }}>
-                    <h3>Your Personalized Health Metrics:</h3>
-                    <p style={{ fontSize: '1.2em', color: bmiStatus.color, fontWeight: 700, marginBlock: '10px' }}>BMI ({bmi}): {bmiStatus.text}</p>
-                    <hr style={{ margin: '15px 0', borderColor: '#eee' }} />
-                    
-                    <h3>Estimated Daily Nutrition Goals:</h3>
-                    <p>TDEE: <strong>{dailyCalories} kcal</strong></p>
-                    
-                    <div className="chart-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-around', gap: '20px', marginTop: '20px' }}>
-                        <div className="pie-chart" style={pieChartStyle}></div>
-                        
-                        <ul className="legend" style={{ listStyle: 'none', padding: 0, textAlign: 'left', fontSize: '0.95em' }}>
-                            <li style={{ display: 'flex', alignItems: 'center' }}><span style={{ backgroundColor: '#f44336', display: 'inline-block', width: '12px', height: '12px', marginRight: '8px', borderRadius: '2px' }}></span>Protein: <strong>{proteinGrams}g</strong> ({proteinPercent}%)</li>
-                            <li style={{ display: 'flex', alignItems: 'center' }}><span style={{ backgroundColor: '#2196F3', display: 'inline-block', width: '12px', height: '12px', marginRight: '8px', borderRadius: '2px' }}></span>Carbohydrates: <strong>{carbGrams}g</strong> ({carbPercent}%)</li>
-                            <li style={{ display: 'flex', alignItems: 'center' }}><span style={{ backgroundColor: '#FFC107', display: 'inline-block', width: '12px', height: '12px', marginRight: '8px', borderRadius: '2px' }}></span>Fat: <strong>{fatGrams}g</strong> ({fatPercent}%)</li>
-                        </ul>
-                    </div>
-                    {warning}
-                </div>
-            );
-        };
-
-        const Calculator = ({ setMealPlan, onNavigate }) => {
-            const [formData, setFormData] = useState({ age: '', gender: '', weight: '', height: '', activity: '' });
-            const [errors, setErrors] = useState({});
-            const [loading, setLoading] = useState(false);
-            const [metrics, setMetrics] = useState(null);
-            const generateMealPlan = useMealPlanGenerator();
-
-            const handleChange = (e) => {
-                const { id, value } = e.target;
-                setFormData(prev => ({ ...prev, [id]: value }));
-                setErrors(prev => {
-                    const newErrors = { ...prev };
-                    delete newErrors[id];
-                    return newErrors;
-                });
-            };
-
-            const validateForm = () => {
-                let newErrors = {};
-                let isValid = true;
-                
-                Object.keys(formData).forEach(key => {
-                    if (!formData[key]) {
-                        newErrors[key] = "This field is required.";
-                        isValid = false;
-                    }
-                });
-                
-                const numericFields = ['age', 'weight', 'height'];
-                numericFields.forEach(key => {
-                    const value = parseFloat(formData[key]);
-                    if (value <= 0) {
-                        newErrors[key] = "Value must be positive.";
-                        isValid = false;
-                    }
-                });
-                
-                setErrors(newErrors);
-                return isValid;
-            };
-
-            const calculateCalories = async () => {
-                if (!validateForm()) return;
-
-                setLoading(true);
-                
-                const { age, gender, weight, height, activity } = formData;
-                const weightFloat = parseFloat(weight);
-                const heightCmFloat = parseFloat(height);
-                const activityFloat = parseFloat(activity);
-                const heightM = heightCmFloat / 100;
-
-                // 1. Calculate BMR (Mifflin-St Jeor)
-                let bmr;
-                if (gender === 'male') {
-                    bmr = (10 * weightFloat) + (6.25 * heightCmFloat) - (5 * parseInt(age)) + 5;
-                } else {
-                    bmr = (10 * weightFloat) + (6.25 * heightCmFloat) - (5 * parseInt(age)) - 161;
-                }
-
-                // 2. Calculate TDEE and Macros (25% P, 50% C, 25% F)
-                const dailyCalories = bmr * activityFloat;
-                const totalCalories = Math.round(dailyCalories);
-
-                const proteinPercent = 25;
-                const carbPercent = 50;
-                const fatPercent = 25;
-                
-                const proteinGrams = Math.round((dailyCalories * (proteinPercent / 100)) / 4);
-                const fatGrams = Math.round((dailyCalories * (fatPercent / 100)) / 9);
-                const carbGrams = Math.round((dailyCalories * (carbPercent / 100)) / 4);
-                
-                // 3. Calculate BMI
-                const bmi = weightFloat / (heightM * heightM);
-                const roundedBmi = parseFloat(bmi.toFixed(2));
-                const bmiStatus = getBmiStatus(roundedBmi);
-
-                const newMetrics = {
-                    dailyCalories: totalCalories,
-                    proteinGrams, carbGrams, fatGrams, 
-                    proteinPercent, carbPercent, fatPercent,
-                    age: parseInt(age), bmi: roundedBmi, bmiStatus
-                };
-                setMetrics(newMetrics);
-
-                await new Promise(resolve => setTimeout(resolve, 1000)); 
-                const plan = generateMealPlan(proteinGrams);
-                setMealPlan(plan);
-                setLoading(false);
-                
-                onNavigate('recommendations');
-            };
-
-            const inputStyle = (key) => ({ 
-                padding: '12px', 
-                borderRadius: '8px', 
-                borderColor: errors[key] ? '#D32F2F' : '#c8e6c9', 
-                width: '100%',
-                marginTop: '5px',
-                fontSize: '1.05em'
+        if (type === 'signup') {
+          const already = metrics.userList.find(u => u.email === user.email);
+          if (!already) {
+            metrics.signupCount += 1;
+            metrics.userList.push({
+              email: user.email,
+              name: user.name,
+              role: user.role,
+              createdAt: new Date().toLocaleString()
             });
+          }
+        }
+        localStorage.setItem(ADMIN_STORAGE_KEY, JSON.stringify(metrics));
+      } catch (e) {
+        console.error('Failed to update admin metrics:', e);
+      }
+    };
 
-            return (
-                <section id="analysis" style={{ background: 'linear-gradient(145deg, #e8f5e9, #dcefe0)', padding: '50px', maxWidth: '1100px', margin: '30px auto', borderRadius: '12px' }}>
-                    <h2>1. Nutrient Analysis Hub</h2>
-                    <form onSubmit={(e) => { e.preventDefault(); calculateCalories(); }}>
-                        
-                        {['age', 'gender', 'weight', 'height', 'activity'].map(key => (
-                            <div className="form-group" key={key} style={{ display: 'flex', flexDirection: 'column', margin: '15px 0' }}>
-                                <label htmlFor={key} style={{ fontWeight: '700', color: '#1b5e20' }}>{key.charAt(0).toUpperCase() + key.slice(1)}:</label>
-                                {key === 'gender' || key === 'activity' ? (
-                                    <select id={key} value={formData[key]} onChange={handleChange} style={inputStyle(key)}>
-                                        <option value="">Select</option>
-                                        {key === 'gender' && (
-                                            <>
-                                                <option value="male">Male</option>
-                                                <option value="female">Female</option>
-                                            </>
-                                        )}
-                                        {key === 'activity' && (
-                                            <>
-                                                <option value="1.2">Sedentary</option>
-                                                <option value="1.375">Lightly active</option>
-                                                <option value="1.55">Moderately active</option>
-                                                <option value="1.725">Very active</option>
-                                                <option value="1.9">Super active</option>
-                                            </>
-                                        )}
-                                    </select>
-                                ) : (
-                                    <input type="number" id={key} value={formData[key]} onChange={handleChange} min="1" step={key === 'weight' ? '0.1' : '1'} style={inputStyle(key)} />
-                                )}
-                                {errors[key] && <span className="error-message" style={{ color: '#D32F2F', fontSize: '0.8em', marginTop: '5px' }}>{errors[key]}</span>}
-                            </div>
-                        ))}
+    const getAdminMetrics = () => {
+      try {
+        const stored = localStorage.getItem(ADMIN_STORAGE_KEY);
+        return stored
+          ? JSON.parse(stored)
+          : { signupCount: 0, userList: [] };
+      } catch (e) {
+        console.error('Error reading admin metrics:', e);
+        return { signupCount: 0, userList: [] };
+      }
+    };
 
-                        <button type="submit" disabled={loading} style={{ width: '100%', padding: '15px', marginTop: '20px', backgroundColor: '#f4a261' }}>
-                            {loading ? 'Calculating...' : 'Generate Personalized Plan'}
-                        </button>
-                    </form>
-                    <AnalysisResults metrics={metrics} />
-                </section>
-            );
-        };
+    const AuthProvider = ({ children }) => {
+      const [currentUser, setCurrentUser] = useState(null);
+      const [isLoading, setIsLoading] = useState(true);
 
-        const MealPlanTable = ({ mealPlan }) => {
-            const tableStyle = { width: '100%', borderCollapse: 'collapse', marginTop: '20px' };
-            const thStyle = { border: '1px solid #ddd', padding: '12px', textAlign: 'left', backgroundColor: '#4CAF50', color: 'white' };
-            const tdStyle = { border: '1px solid #ddd', padding: '12px', textAlign: 'left' };
+      // Load saved user from localStorage
+      useEffect(() => {
+        const savedUser = localStorage.getItem('currentUser');
+        if (savedUser) {
+          try {
+            setCurrentUser(JSON.parse(savedUser));
+          } catch (e) {
+            localStorage.removeItem('currentUser');
+          }
+        }
+        setIsLoading(false);
+      }, []);
 
-            if (!mealPlan || mealPlan.length === 0) {
-                return <div style={{ textAlign: 'center', color: '#777', padding: '20px' }}>**Please use the Nutrient Analysis Hub (Section 1) above to generate your plan.**</div>;
+      // Login function
+      const login = (email, password) => {
+        return new Promise(resolve => {
+          setTimeout(() => {
+            const lowerEmail = email.toLowerCase();
+
+            // Admin login
+            if (lowerEmail === ADMIN_EMAIL) {
+              if (password === ADMIN_PASSWORD) {
+                const user = { email, name: 'Admin', role: 'admin' };
+                localStorage.setItem('currentUser', JSON.stringify(user));
+                setCurrentUser(user);
+                resolve({ success: true, user });
+              } else {
+                resolve({ success: false, error: 'Invalid admin password.' });
+              }
+              return;
             }
 
-            return (
-                <table style={tableStyle}>
-                    <thead>
-                        <tr>
-                            <th style={thStyle}>Day</th><th style={thStyle}>Breakfast</th><th style={thStyle}>Lunch</th><th style={thStyle}>Dinner</th><th style={thStyle}>Snack</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {mealPlan.map((item, index) => (
-                            <tr key={index} style={{ backgroundColor: index % 2 === 0 ? '#f2f2f2' : 'white' }}>
-                                <td style={tdStyle}>{item.day}</td>
-                                <td style={tdStyle}>{item.breakfast}</td>
-                                <td style={tdStyle}>{item.lunch}</td>
-                                <td style={tdStyle}>{item.dinner}</td>
-                                <td style={tdStyle}>{item.snack}</td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            );
-        };
+            // Normal user login (simple check)
+            if (email && password && password.length >= 6) {
+              const user = {
+                email,
+                name: email.split('@')[0],
+                role: 'user'
+              };
+              localStorage.setItem('currentUser', JSON.stringify(user));
+              setCurrentUser(user);
+              resolve({ success: true, user });
+            } else {
+              resolve({
+                success: false,
+                error: 'Invalid credentials or password too short (min 6 chars).'
+              });
+            }
+          }, 700);
+        });
+      };
 
+      // Signup function
+      const signup = (email, password, name) => {
+        return new Promise(resolve => {
+          if (password.length < 6) {
+            return resolve({
+              success: false,
+              error: 'Password must be at least 6 characters.'
+            });
+          }
+          if (email.toLowerCase() === ADMIN_EMAIL) {
+            return resolve({
+              success: false,
+              error: 'The admin email is reserved for admin login only.'
+            });
+          }
 
-        // =======================================================
-        // E. App.js (Main Entry Point and Routing)
-        // =======================================================
-
-        const Header = () => (
-            <header style={{ background: '#2e7d32', color: 'white', textAlign: 'center', padding: '40px 20px', boxShadow: '0 4px 10px rgba(0,0,0,0.1)' }}>
-                <h1>HealthyLife Nutrition Hub</h1>
-                <p>Advanced Diet Balancing & Nutrient Deficit Detection Platform</p>
-            </header>
-        );
-
-        const Footer = () => (
-            <footer style={{ background: '#333', color: 'white', padding: '30px', marginTop: '50px', textAlign: 'center' }}>
-                &copy; 2025 HealthyLife Nutrition Hub | Designed for a Healthier You 🌿
-            </footer>
-        );
-
-        const AboutSection = () => (
-            <section id="about" style={{ maxWidth: '1100px', margin: '30px auto', padding: '80px 20px', backgroundColor: 'white', borderRadius: '12px', boxShadow: '0 10px 30px rgba(0,0,0,0.05)' }}>
-                <h2>About Our Platform</h2>
-                <p style={{ textAlign: 'center' }}>Welcome to **HealthyLife Nutrition Hub** — your intelligent platform for balanced living. We combine the **Mifflin-St Jeor formula** with expert nutritional guidelines to accurately predict your energy needs and generate a **personalized, 7-day meal plan** focused on correcting common **nutrient deficiencies**.</p>
-            </section>
-        );
-
-        const RecommendationsSection = ({ mealPlan }) => (
-            <section id="recommendations" style={{ maxWidth: '1100px', margin: '30px auto', padding: '80px 20px', backgroundColor: 'white', borderRadius: '12px', boxShadow: '0 10px 30px rgba(0,0,0,0.05)' }}>
-                <h2>2. Personalized Recommendations (7-Day Plan)</h2>
-                <p style={{ textAlign: 'center', marginBlock: '20px' }}>This plan is dynamically generated based on your calculated **Macronutrient Goals**.</p>
-                <MealPlanTable mealPlan={mealPlan} />
-            </section>
-        );
-
-        const NavBar = ({ navigateTo }) => {
-            const { isAuthenticated, currentUser, logout } = useAuth();
-            const isAdmin = currentUser && currentUser.role === 'admin';
-
-            return (
-                <nav style={{ backgroundColor: '#388E3C', padding: '15px', display: 'flex', alignItems: 'center', position: 'sticky', top: 0, zIndex: 100 }}>
-                    <a href="#about" onClick={() => navigateTo('about')} style={{ color: 'white', textDecoration: 'none', margin: '0 15px', fontWeight: 600 }}>About</a>
-                    
-                    {isAuthenticated ? (
-                        <>
-                            <a href="#analysis" onClick={() => navigateTo('analysis')} style={{ color: 'white', textDecoration: 'none', margin: '0 15px', fontWeight: 600 }}>Nutrient Analysis Hub</a>
-                            <a href="#recommendations" onClick={() => navigateTo('recommendations')} style={{ color: 'white', textDecoration: 'none', margin: '0 15px', fontWeight: 600 }}>Personalized Plan</a>
-                            
-                            {isAdmin && (
-                                <a href="#admin" onClick={() => navigateTo('admin')} style={{ color: '#FFD700', fontWeight: '700', textShadow: '1px 1px 2px #000' }}>👑 Admin Dashboard</a>
-                            )}
-                            
-                            <div className="auth-status" style={{ display: 'flex', alignItems: 'center', marginLeft: 'auto', gap: '15px' }}>
-                                <span className="welcome-message" style={{ color: '#e8f5e9' }}>Welcome, {currentUser.name}!</span>
-                                <button onClick={logout} style={{ background: '#D32F2F', color: 'white', padding: '8px 15px', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>Logout</button>
-                            </div>
-                        </>
-                    ) : (
-                        <div className="auth-status" style={{ display: 'flex', alignItems: 'center', marginLeft: 'auto', gap: '15px' }}>
-                            <a href="#login" onClick={() => navigateTo('login')} style={{ color: 'white', textDecoration: 'none', fontWeight: 600 }}>Login</a>
-                            <a href="#signup" onClick={() => navigateTo('signup')} style={{ color: 'white', textDecoration: 'none', fontWeight: 600 }}>Sign Up</a>
-                        </div>
-                    )}
-                </nav>
-            );
-        };
-
-        const AppContent = () => {
-            const { isAuthenticated, isLoading, currentUser } = useAuth();
-            const [route, setRoute] = useState('about');
-            const [mealPlan, setMealPlan] = useState([]);
-            
-            const navigateTo = (newRoute) => {
-                window.location.hash = newRoute;
-                setRoute(newRoute);
+          setTimeout(() => {
+            const user = {
+              email,
+              name: name || email.split('@')[0],
+              role: 'user'
             };
+            updateAdminMetrics(user, 'signup');
+            localStorage.setItem('currentUser', JSON.stringify(user));
+            setCurrentUser(user);
+            resolve({ success: true, user });
+          }, 700);
+        });
+      };
 
-            useEffect(() => {
-                const handleHashChange = () => {
-                    if (isLoading) return;
-                    const hash = window.location.hash.substring(1) || 'about';
-                    
-                    let targetRoute = hash;
+      const logout = () => {
+        localStorage.removeItem('currentUser');
+        setCurrentUser(null);
+      };
 
-                    if (isAuthenticated) {
-                        if (['login', 'signup'].includes(targetRoute) || targetRoute === '') {
-                            targetRoute = currentUser.role === 'admin' ? 'admin' : 'analysis'; 
-                        } else if (targetRoute === 'admin' && currentUser.role !== 'admin') {
-                            targetRoute = 'analysis'; 
-                        }
-                    } else {
-                        if (['analysis', 'recommendations', 'admin'].includes(targetRoute)) {
-                            targetRoute = 'login'; 
-                            window.location.hash = 'login';
-                        }
-                    }
-                    setRoute(targetRoute);
-                };
-                
-                handleHashChange(); 
-                window.addEventListener('hashchange', handleHashChange);
-                return () => window.removeEventListener('hashchange', handleHashChange);
-            }, [isAuthenticated, isLoading, currentUser]);
+      const resetAdminMetrics = () => {
+        localStorage.removeItem(ADMIN_STORAGE_KEY);
+      };
 
+      const value = {
+        currentUser,
+        isLoading,
+        login,
+        signup,
+        logout,
+        isAuthenticated: !!currentUser,
+        getAdminMetrics,
+        resetAdminMetrics
+      };
 
-            const renderSection = () => {
-                if (isLoading) {
-                    return <div style={{ textAlign: 'center', padding: '50px' }}>Loading Application...</div>;
-                }
+      return (
+        <AuthContext.Provider value={value}>
+          {children}
+        </AuthContext.Provider>
+      );
+    };
 
-                switch (route) {
-                    case 'login':
-                        return isAuthenticated ? <Calculator setMealPlan={setMealPlan} onNavigate={navigateTo} /> : <LoginPage onNavigate={navigateTo} />;
-                    case 'signup':
-                        return isAuthenticated ? <Calculator setMealPlan={setMealPlan} onNavigate={navigateTo} /> : <SignupPage onNavigate={navigateTo} />;
-                    case 'admin':
-                        return <AdminDashboard />; 
-                    case 'analysis':
-                        return isAuthenticated ? <Calculator setMealPlan={setMealPlan} onNavigate={navigateTo} /> : <LoginPage onNavigate={navigateTo} />;
-                    case 'recommendations':
-                        return isAuthenticated ? <RecommendationsSection mealPlan={mealPlan} /> : <LoginPage onNavigate={navigateTo} />;
-                    case 'about':
-                    default:
-                        return <AboutSection />;
-                }
-            };
+    // =========================================================
+    // 2. SMALL REUSABLE COMPONENTS
+    // =========================================================
 
-            return (
-                <div className="App">
-                    <Header />
-                    <div className="hero-banner" style={{ backgroundImage: "url('https://images.pexels.com/photos/1640772/pexels-photo-1640772.jpeg?auto=compress&cs=tinysrgb&dpr=3&h=720&w=1280')", backgroundSize: 'cover', backgroundPosition: 'center', height: '380px', width: '100%', borderBottom: '5px solid #4CAF50' }}></div>
-                    <NavBar navigateTo={navigateTo} />
-                    <main style={{ minHeight: '60vh' }}>{renderSection()}</main>
-                    <Footer />
-                </div>
-            );
+    const InputField = ({ id, type, placeholder, value, onChange, error }) => (
+      <>
+        <input
+          id={id}
+          type={type}
+          placeholder={placeholder}
+          value={value}
+          onChange={e => onChange(e.target.value)}
+          required
+        />
+        {error && (
+          <p
+            style={{
+              color: 'crimson',
+              fontSize: '0.8em',
+              textAlign: 'left',
+              marginBottom: '5px'
+            }}
+          >
+            {error}
+          </p>
+        )}
+      </>
+    );
+
+    // =========================================================
+    // 3. AUTH PAGES (LOGIN / SIGNUP)
+    // =========================================================
+
+    const LoginPage = ({ onNavigate }) => {
+      const { login } = useAuth();
+      const [email, setEmail] = useState('');
+      const [password, setPassword] = useState('');
+      const [error, setError] = useState('');
+      const [loading, setLoading] = useState(false);
+
+      const handleSubmit = async e => {
+        e.preventDefault();
+        setError('');
+        setLoading(true);
+
+        const result = await login(email, password);
+        setLoading(false);
+
+        if (result.success) {
+          onNavigate(result.user.role === 'admin' ? 'admin' : 'userHome');
+        } else {
+          setError(result.error);
+        }
+      };
+
+      return (
+        <section id="login" style={{ maxWidth: '420px', margin: '40px auto' }}>
+          <div className="card" style={{ padding: '35px 28px' }}>
+            <h2 style={{ marginTop: 0 }}>Welcome Back 👋</h2>
+            <p
+              style={{
+                textAlign: 'center',
+                fontSize: '.9em',
+                color: 'dimgray'
+              }}
+            >
+              Log in as <strong>user</strong> with any email &amp; password (min
+              6 chars).
+              <br />
+              Log in as <strong>admin</strong> using the admin email &amp;
+              password.
+            </p>
+            <form onSubmit={handleSubmit}>
+              <InputField
+                id="login-email"
+                type="email"
+                placeholder="Email Address"
+                value={email}
+                onChange={setEmail}
+              />
+              <InputField
+                id="login-password"
+                type="password"
+                placeholder="Password"
+                value={password}
+                onChange={setPassword}
+              />
+              <button
+                type="submit"
+                disabled={loading}
+                style={{
+                  width: '100%',
+                  marginTop: '10px',
+                  padding: '13px',
+                  backgroundColor: 'orange'
+                }}
+              >
+                {loading ? 'Authenticating...' : 'Log In'}
+              </button>
+              <p
+                style={{
+                  marginTop: '15px',
+                  fontSize: '0.9em',
+                  textAlign: 'center'
+                }}
+              >
+                New here?{' '}
+                <a href="#" onClick={() => onNavigate('signup')}>
+                  Create a free account
+                </a>
+              </p>
+              {error && (
+                <p
+                  style={{
+                    color: 'crimson',
+                    marginTop: '10px',
+                    textAlign: 'center'
+                  }}
+                >
+                  {error}
+                </p>
+              )}
+            </form>
+          </div>
+        </section>
+      );
+    };
+
+    const SignupPage = ({ onNavigate }) => {
+      const { signup } = useAuth();
+      const [name, setName] = useState('');
+      const [email, setEmail] = useState('');
+      const [password, setPassword] = useState('');
+      const [error, setError] = useState('');
+      const [loading, setLoading] = useState(false);
+
+      const handleSubmit = async e => {
+        e.preventDefault();
+        setError('');
+        setLoading(true);
+
+        const result = await signup(email, password, name);
+        setLoading(false);
+
+        if (result.success) {
+          onNavigate('userHome');
+        } else {
+          setError(result.error);
+        }
+      };
+
+      return (
+        <section id="signup" style={{ maxWidth: '420px', margin: '40px auto' }}>
+          <div className="card" style={{ padding: '35px 28px' }}>
+            <h2 style={{ marginTop: 0 }}>Create Your Account 🌱</h2>
+            <p
+              style={{
+                textAlign: 'center',
+                fontSize: '.9em',
+                color: 'dimgray'
+              }}
+            >
+              It takes less than a minute to start your healthy journey.
+            </p>
+            <form onSubmit={handleSubmit}>
+              <InputField
+                id="signup-name"
+                type="text"
+                placeholder="Full Name"
+                value={name}
+                onChange={setName}
+              />
+              <InputField
+                id="signup-email"
+                type="email"
+                placeholder="Email Address"
+                value={email}
+                onChange={setEmail}
+              />
+              <InputField
+                id="signup-password"
+                type="password"
+                placeholder="Choose Password (min 6 chars)"
+                value={password}
+                onChange={setPassword}
+              />
+              <button
+                type="submit"
+                disabled={loading}
+                style={{
+                  width: '100%',
+                  marginTop: '10px',
+                  padding: '13px',
+                  backgroundColor: 'orange'
+                }}
+              >
+                {loading ? 'Creating...' : 'Sign Up'}
+              </button>
+              <p
+                style={{
+                  marginTop: '15px',
+                  fontSize: '0.9em',
+                  textAlign: 'center'
+                }}
+              >
+                Already registered?{' '}
+                <a href="#" onClick={() => onNavigate('login')}>
+                  Log In
+                </a>
+              </p>
+              {error && (
+                <p
+                  style={{
+                    color: 'crimson',
+                    marginTop: '10px',
+                    textAlign: 'center'
+                  }}
+                >
+                  {error}
+                </p>
+              )}
+            </form>
+          </div>
+        </section>
+      );
+    };
+
+    // =========================================================
+    // 4. ADMIN DASHBOARD (SIMULATED)
+    // =========================================================
+
+    const AdminDashboard = () => {
+      const { currentUser, getAdminMetrics, resetAdminMetrics } = useAuth();
+      const [metrics, setMetrics] = useState({
+        signupCount: 0,
+        userList: []
+      });
+
+      const reloadMetrics = useCallback(() => {
+        setMetrics(getAdminMetrics());
+      }, [getAdminMetrics]);
+
+      useEffect(() => {
+        reloadMetrics();
+      }, [reloadMetrics]);
+
+      if (!currentUser || currentUser.role !== 'admin') {
+        return (
+          <p style={{ color: 'crimson', textAlign: 'center', padding: '50px' }}>
+            Access Denied. Only admin can view this panel.
+          </p>
+        );
+      }
+
+      const handleReset = () => {
+        if (window.confirm('Reset simulated user data and signup count?')) {
+          resetAdminMetrics();
+          reloadMetrics();
+          alert('Admin stats reset (simulated).');
+        }
+      };
+
+      const lastUser =
+        metrics.userList[metrics.userList.length - 1] || null;
+
+      const thStyle = {
+        padding: '10px',
+        border: '1px solid lightgray',
+        backgroundColor: 'forestgreen',
+        color: 'white'
+      };
+      const tdStyle = {
+        padding: '8px',
+        border: '1px solid whitesmoke',
+        fontSize: '.9em'
+      };
+
+      return (
+        <section
+          style={{
+            padding: '50px 20px',
+            maxWidth: '1150px',
+            margin: '30px auto'
+          }}
+        >
+          {/* Top Cards */}
+          <div
+            style={{
+              display: 'flex',
+              gap: '20px',
+              flexWrap: 'wrap',
+              marginBottom: '25px'
+            }}
+          >
+            {/* Admin Info */}
+            <div className="card" style={{ flex: '1 1 260px', padding: '20px' }}>
+              <h3 style={{ marginTop: 0 }}>👑 Admin Overview</h3>
+              <p style={{ margin: '6px 0', fontSize: '.95em' }}>
+                Signed in as: <strong>{currentUser.email}</strong>
+              </p>
+              <p
+                style={{
+                  margin: '6px 0',
+                  fontSize: '.9em',
+                  color: 'dimgray'
+                }}
+              >
+                Monitor sign-ups and review users from this dashboard.
+              </p>
+            </div>
+
+            {/* Total Users */}
+            <div
+              className="card"
+              style={{
+                flex: '1 1 200px',
+                padding: '20px',
+                textAlign: 'center',
+                background: 'honeydew'
+              }}
+            >
+              <h3>Total Users</h3>
+              <p
+                style={{
+                  fontSize: '2.3em',
+                  margin: '8px 0',
+                  color: 'seagreen',
+                  fontWeight: 'bold'
+                }}
+              >
+                {metrics.signupCount}
+              </p>
+              <p style={{ fontSize: '.85em', color: 'dimgray' }}>
+                Total registered users (simulated).
+              </p>
+              <button
+                onClick={handleReset}
+                style={{
+                  background: 'crimson',
+                  marginTop: '10px',
+                  padding: '6px 10px',
+                  fontSize: '.8em'
+                }}
+              >
+                Reset Admin Data
+              </button>
+            </div>
+
+            {/* Latest User */}
+            <div className="card" style={{ flex: '1 1 260px', padding: '20px' }}>
+              <h3>Latest User</h3>
+              {lastUser ? (
+                <>
+                  <p style={{ margin: '5px 0' }}>
+                    <strong>{lastUser.name}</strong>
+                  </p>
+                  <p style={{ margin: '5px 0', fontSize: '.9em' }}>
+                    {lastUser.email}
+                  </p>
+                  <p
+                    style={{
+                      margin: '5px 0',
+                      fontSize: '.8em',
+                      color: 'gray'
+                    }}
+                  >
+                    Joined: {lastUser.createdAt}
+                  </p>
+                </>
+              ) : (
+                <p style={{ fontSize: '.9em' }}>No users have signed up yet.</p>
+              )}
+            </div>
+          </div>
+
+          {/* User Table */}
+          <div className="card" style={{ padding: '20px' }}>
+            <h3 style={{ marginTop: 0 }}>👥 User List</h3>
+            <p
+              style={{
+                fontSize: '.85em',
+                color: 'dimgray',
+                marginBottom: '10px'
+              }}
+            >
+              Preview of all simulated users in the system.
+            </p>
+            <div style={{ overflowX: 'auto' }}>
+              <table
+                style={{
+                  width: '100%',
+                  borderCollapse: 'collapse',
+                  fontSize: '.9em'
+                }}
+              >
+                <thead>
+                  <tr>
+                    <th style={thStyle}>#</th>
+                    <th style={thStyle}>Name</th>
+                    <th style={thStyle}>Email</th>
+                    <th style={thStyle}>Role</th>
+                    <th style={thStyle}>Joined on</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {metrics.userList.length === 0 ? (
+                    <tr>
+                      <td
+                        colSpan="5"
+                        style={{
+                          padding: '10px',
+                          textAlign: 'center',
+                          color: 'gray'
+                        }}
+                      >
+                        No user signups yet.
+                      </td>
+                    </tr>
+                  ) : (
+                    metrics.userList.map((user, index) => (
+                      <tr key={index}>
+                        <td style={tdStyle}>{index + 1}</td>
+                        <td style={tdStyle}>{user.name}</td>
+                        <td style={tdStyle}>{user.email}</td>
+                        <td style={tdStyle}>{user.role}</td>
+                        <td style={tdStyle}>{user.createdAt}</td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      );
+    };
+
+    // =========================================================
+    // 5. NUTRITION LOGIC (BMI, MEALS, VEG/NON-VEG)
+    // =========================================================
+
+    // Pre-defined meal patterns (realistic Indian style)
+    const Meals = {
+      veg: {
+        protein_meals: [
+          'Paneer bhurji with veggies',
+          'Moong dal khichdi with curd',
+          'Sprouted moong salad with lemon',
+          'Chole (chickpea curry) with salad',
+          'Palak dal (spinach & lentils)',
+          'Rajma curry (kidney beans) with salad',
+          'Sambar with mixed vegetables & dal'
+        ],
+        carb_meals: [
+          '2 wheat phulkas + veg curry',
+          'Steamed rice + veg sambar',
+          'Vegetable upma',
+          'Vegetable pulao',
+          'Curd rice with tadka',
+          '2 idlis + sambar',
+          'Poha with vegetables & peanuts'
+        ],
+        fat_meals: [
+          'Handful of peanuts',
+          'Handful of almonds',
+          '1 tsp ghee on rice/chapati',
+          'Peanut chutney + vegetable sticks',
+          'Coconut chutney + steamed veg',
+          'Buttermilk with roasted seeds',
+          'Mixed nuts & seeds trail mix'
+        ]
+      },
+      nonveg: {
+        protein_meals: [
+          '2 boiled eggs + salad',
+          'Grilled chicken curry + salad',
+          'Lightly fried fish + salad',
+          'Egg bhurji with vegetables',
+          'Chicken soup with vegetables',
+          'Fish curry with light gravy',
+          'Omelette with onions & tomato'
+        ],
+        carb_meals: [
+          'Rice + chicken curry (controlled portion)',
+          '2 chapatis + egg curry',
+          'Lemon rice + boiled egg',
+          'Jeera rice + fish curry',
+          'Curd rice + egg fry',
+          'Vegetable pulao + chicken pieces',
+          'Rice + fish fry (shallow)'
+        ],
+        fat_meals: [
+          'Handful of cashews',
+          '1 egg with yolk',
+          'Small piece of fish (omega-3)',
+          'Groundnut chikki (small piece)',
+          'Curd + roasted seeds',
+          'Paneer cubes stir fried',
+          'Olive oil drizzled salad'
+        ]
+      }
+    };
+
+    const getBmiStatus = bmi => {
+      if (bmi < 18.5) return { text: 'Underweight', color: 'gold' };
+      if (bmi < 25) return { text: 'Healthy Weight', color: 'seagreen' };
+      if (bmi < 30) return { text: 'Overweight', color: 'darkorange' };
+      return { text: 'Obese', color: 'crimson' };
+    };
+
+    // Generate 7-day plan based on BMI + Veg/Non-Veg
+    const useMealPlanGenerator = () =>
+      useCallback((proteinGoal, dietType, bmiCategory, calories) => {
+        const src = Meals[dietType] || Meals.veg;
+        const days = [
+          'Day 1',
+          'Day 2',
+          'Day 3',
+          'Day 4',
+          'Day 5',
+          'Day 6',
+          'Day 7'
+        ];
+
+        const focusByBmi = {
+          Underweight: 'Healthy weight gain & strength',
+          'Healthy Weight': 'Maintenance & steady energy',
+          Overweight: 'Weight control & fullness',
+          Obese: 'Fat loss & blood sugar control'
         };
 
-        const AppWrapper = () => (
-            <AuthProvider>
-                <AppContent />
-            </AuthProvider>
+        const focusText = focusByBmi[bmiCategory] || 'Balanced nutrition';
+
+        return days.map((day, i) => {
+          let breakfast = src.protein_meals[i % src.protein_meals.length];
+          let lunch, dinner;
+
+          // Simple rotation pattern for lunch & dinner
+          if (i % 3 === 0) {
+            lunch = src.protein_meals[(i + 1) % src.protein_meals.length];
+            dinner = src.carb_meals[(i + 2) % src.carb_meals.length];
+          } else if (i % 3 === 1) {
+            lunch = src.carb_meals[(i + 3) % src.carb_meals.length];
+            dinner = src.protein_meals[(i + 4) % src.protein_meals.length];
+          } else {
+            lunch = src.carb_meals[(i + 5) % src.carb_meals.length];
+            dinner = src.protein_meals[(i + 6) % src.protein_meals.length];
+          }
+
+          // Portion notes based on BMI
+          let portionNote = '';
+          if (bmiCategory === 'Underweight') {
+            portionNote =
+              ' (slightly larger portions, add 1 tsp ghee or oil)';
+          } else if (bmiCategory === 'Healthy Weight') {
+            portionNote =
+              ' (normal portion: 1 plate, half filled with vegetables)';
+          } else if (bmiCategory === 'Overweight') {
+            portionNote =
+              ' (small portion of rice/roti, extra salad and vegetables)';
+          } else if (bmiCategory === 'Obese') {
+            portionNote =
+              ' (very light on rice/roti, focus on dal/vegetables and salad)';
+          }
+
+          lunch += portionNote;
+          dinner += portionNote;
+
+          // Snack based on BMI
+          let snack;
+          if (bmiCategory === 'Underweight') {
+            snack = 'Banana + handful of nuts or dry fruits';
+          } else if (bmiCategory === 'Healthy Weight') {
+            snack = src.fat_meals[i % src.fat_meals.length];
+          } else if (bmiCategory === 'Overweight') {
+            snack =
+              '1 seasonal fruit (guava/apple/orange) + buttermilk (no sugar)';
+          } else {
+            snack =
+              'Sprouted salad or cucumber + tomato salad, green tea (no sugar)';
+          }
+
+          // High protein focus note (optional)
+          if (proteinGoal > 120) {
+            dinner = 'High-protein focus: ' + dinner;
+          }
+
+          return {
+            day,
+            breakfast,
+            lunch,
+            dinner,
+            snack,
+            focus: focusText
+          };
+        });
+      }, []);
+
+    // =========================================================
+    // 6. ANALYSIS RESULT CARD
+    // =========================================================
+
+    const AnalysisResults = ({ metrics }) => {
+      if (!metrics) return null;
+
+      const {
+        dailyCalories,
+        proteinGrams,
+        carbGrams,
+        fatGrams,
+        bmi,
+        bmiStatus,
+        age,
+        proteinPercent,
+        carbPercent,
+        fatPercent,
+        dietType
+      } = metrics;
+
+      const proteinEnd = proteinPercent;
+      const carbStart = proteinEnd;
+      const carbEnd = carbStart + carbPercent;
+      const fatStart = carbEnd;
+
+      const pieChartStyle = {
+        background: `conic-gradient(
+          red 0% ${proteinEnd}%,
+          royalblue ${carbStart}% ${carbEnd}%,
+          gold ${fatStart}% 100%
+        )`,
+        width: '120px',
+        height: '120px',
+        borderRadius: '50%'
+      };
+
+      const warning =
+        age >= 4 && age < 18 ? (
+          <p
+            style={{
+              color: 'crimson',
+              fontWeight: 700,
+              marginTop: '15px',
+              fontSize: '.9em'
+            }}
+          >
+            ⚠️ For growing children and teens, ensure regular intake of{' '}
+            <strong>Iron, Calcium, and Vitamin D</strong>.
+          </p>
+        ) : null;
+
+      return (
+        <div className="card" style={{ marginTop: '25px', padding: '20px' }}>
+          <h3>Your Personalized Health Snapshot</h3>
+          <p
+            style={{
+              fontSize: '1.1em',
+              color: bmiStatus.color,
+              fontWeight: 700
+            }}
+          >
+            BMI ({bmi}): {bmiStatus.text}
+          </p>
+          <p style={{ marginTop: '5px' }}>
+            Estimated daily energy need (TDEE):{' '}
+            <strong>{dailyCalories} kcal</strong>
+          </p>
+          <p style={{ marginTop: '5px' }}>
+            Diet Type Selected:{' '}
+            <strong>
+              {dietType === 'veg' ? 'Vegetarian (Veg)' : 'Non-Vegetarian (Non-Veg)'}
+            </strong>
+          </p>
+
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-around',
+              gap: '20px',
+              marginTop: '15px',
+              flexWrap: 'wrap'
+            }}
+          >
+            <div style={pieChartStyle}></div>
+            <ul style={{ listStyle: 'none', padding: 0, fontSize: '.95em' }}>
+              <li>
+                <span
+                  style={{
+                    background: 'red',
+                    display: 'inline-block',
+                    width: '12px',
+                    height: '12px',
+                    marginRight: '6px'
+                  }}
+                ></span>
+                Protein: <strong>{proteinGrams} g</strong> ({proteinPercent}
+                %)
+              </li>
+              <li>
+                <span
+                  style={{
+                    background: 'royalblue',
+                    display: 'inline-block',
+                    width: '12px',
+                    height: '12px',
+                    marginRight: '6px'
+                  }}
+                ></span>
+                Carbohydrate: <strong>{carbGrams} g</strong> ({carbPercent}
+                %)
+              </li>
+              <li>
+                <span
+                  style={{
+                    background: 'gold',
+                    display: 'inline-block',
+                    width: '12px',
+                    height: '12px',
+                    marginRight: '6px'
+                  }}
+                ></span>
+                Fat: <strong>{fatGrams} g</strong> ({fatPercent}%)
+              </li>
+            </ul>
+          </div>
+
+          {warning}
+        </div>
+      );
+    };
+
+    // =========================================================
+    // 7. CALCULATOR (FORM + BMI/TDEE + MEAL PLAN GENERATION)
+    // =========================================================
+
+    const Calculator = ({ setMealPlan, onNavigate }) => {
+      const [formData, setFormData] = useState({
+        age: '',
+        gender: '',
+        weight: '',
+        height: '',
+        activity: '',
+        dietType: ''
+      });
+
+      const [errors, setErrors] = useState({});
+      const [loading, setLoading] = useState(false);
+      const [metrics, setMetrics] = useState(null);
+      const generateMealPlan = useMealPlanGenerator();
+
+      // Update form and clear error for that field
+      const handleChange = e => {
+        const { id, value } = e.target;
+        setFormData(prev => ({ ...prev, [id]: value }));
+        setErrors(prev => {
+          const copy = { ...prev };
+          delete copy[id];
+          return copy;
+        });
+      };
+
+      const validateForm = () => {
+        let newErrors = {};
+        let isValid = true;
+
+        // required fields
+        Object.keys(formData).forEach(key => {
+          if (!formData[key]) {
+            newErrors[key] = 'This field is required.';
+            isValid = false;
+          }
+        });
+
+        // age, weight, height must be positive
+        ['age', 'weight', 'height'].forEach(key => {
+          const value = parseFloat(formData[key]);
+          if (value <= 0 || Number.isNaN(value)) {
+            newErrors[key] = 'Value must be positive.';
+            isValid = false;
+          }
+        });
+
+        setErrors(newErrors);
+        return isValid;
+      };
+
+      const calculateCalories = async () => {
+        if (!validateForm()) return;
+        setLoading(true);
+
+        const { age, gender, weight, height, activity, dietType } = formData;
+
+        const w = parseFloat(weight);
+        const hCm = parseFloat(height);
+        const activityFactor = parseFloat(activity);
+        const hMeters = hCm / 100;
+
+        // BMR by Mifflin-St Jeor
+        let bmr;
+        if (gender === 'male') {
+          bmr = 10 * w + 6.25 * hCm - 5 * parseInt(age) + 5;
+        } else {
+          bmr = 10 * w + 6.25 * hCm - 5 * parseInt(age) - 161;
+        }
+
+        // TDEE
+        const dailyCalories = bmr * activityFactor;
+        const totalCalories = Math.round(dailyCalories);
+
+        // Macro distribution 25/50/25
+        const proteinPercent = 25;
+        const carbPercent = 50;
+        const fatPercent = 25;
+
+        const proteinGrams = Math.round(
+          (dailyCalories * (proteinPercent / 100)) / 4
+        );
+        const fatGrams = Math.round(
+          (dailyCalories * (fatPercent / 100)) / 9
+        );
+        const carbGrams = Math.round(
+          (dailyCalories * (carbPercent / 100)) / 4
         );
 
-        // 4. Initial Render
-        root.render(<AppWrapper />);
-    </script>
+        // BMI
+        const bmi = w / (hMeters * hMeters);
+        const roundedBmi = parseFloat(bmi.toFixed(2));
+        const bmiStatus = getBmiStatus(roundedBmi);
+
+        const newMetrics = {
+          dailyCalories: totalCalories,
+          proteinGrams,
+          carbGrams,
+          fatGrams,
+          proteinPercent,
+          carbPercent,
+          fatPercent,
+          age: parseInt(age),
+          bmi: roundedBmi,
+          bmiStatus,
+          dietType
+        };
+
+        setMetrics(newMetrics);
+
+        // Small delay just to show "Calculating"
+        await new Promise(r => setTimeout(r, 700));
+
+        // Prepare meal plan but do not navigate automatically
+        const plan = generateMealPlan(
+          proteinGrams,
+          dietType,
+          bmiStatus.text,
+          totalCalories
+        );
+        setMealPlan(plan);
+        setLoading(false);
+      };
+
+      const inputStyle = key => ({
+        padding: '12px',
+        borderRadius: '8px',
+        borderColor: errors[key] ? 'crimson' : 'lightgreen',
+        width: '100%',
+        marginTop: '5px',
+        fontSize: '1.02em'
+      });
+
+      return (
+        <section
+          id="analysis"
+          style={{
+            background: 'linear-gradient(145deg, honeydew, lightgray)',
+            padding: '45px',
+            maxWidth: '1100px',
+            margin: '25px auto',
+            borderRadius: '12px'
+          }}
+        >
+          <h2>1. Nutrient Analysis Hub</h2>
+          <p
+            style={{
+              textAlign: 'center',
+              fontSize: '.95em',
+              color: 'dimgray',
+              maxWidth: '650px',
+              margin: '0 auto 20px'
+            }}
+          >
+            Enter your details and choose <strong>Veg / Non-Veg</strong> to get
+            a personalized macro breakdown and a BMI-aware 7-day meal plan.
+          </p>
+
+          {/* Input Form */}
+          <form
+            onSubmit={e => {
+              e.preventDefault();
+              calculateCalories();
+            }}
+            style={{ maxWidth: '650px', margin: '0 auto' }}
+          >
+            {/* Age */}
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                margin: '12px 0'
+              }}
+            >
+              <label
+                htmlFor="age"
+                style={{
+                  fontWeight: 700,
+                  color: 'darkgreen',
+                  fontSize: '.95em'
+                }}
+              >
+                Age (years)
+              </label>
+              <input
+                type="number"
+                id="age"
+                value={formData.age}
+                onChange={handleChange}
+                min="1"
+                step="1"
+                style={inputStyle('age')}
+              />
+              {errors.age && (
+                <span
+                  style={{
+                    color: 'crimson',
+                    fontSize: '.8em',
+                    marginTop: '4px'
+                  }}
+                >
+                  {errors.age}
+                </span>
+              )}
+            </div>
+
+            {/* Gender */}
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                margin: '12px 0'
+              }}
+            >
+              <label
+                htmlFor="gender"
+                style={{
+                  fontWeight: 700,
+                  color: 'darkgreen',
+                  fontSize: '.95em'
+                }}
+              >
+                Gender
+              </label>
+              <select
+                id="gender"
+                value={formData.gender}
+                onChange={handleChange}
+                style={inputStyle('gender')}
+              >
+                <option value="">Select</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+              </select>
+              {errors.gender && (
+                <span
+                  style={{
+                    color: 'crimson',
+                    fontSize: '.8em',
+                    marginTop: '4px'
+                  }}
+                >
+                  {errors.gender}
+                </span>
+              )}
+            </div>
+
+            {/* Weight */}
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                margin: '12px 0'
+              }}
+            >
+              <label
+                htmlFor="weight"
+                style={{
+                  fontWeight: 700,
+                  color: 'darkgreen',
+                  fontSize: '.95em'
+                }}
+              >
+                Weight (kg)
+              </label>
+              <input
+                type="number"
+                id="weight"
+                value={formData.weight}
+                onChange={handleChange}
+                min="1"
+                step="0.1"
+                style={inputStyle('weight')}
+              />
+              {errors.weight && (
+                <span
+                  style={{
+                    color: 'crimson',
+                    fontSize: '.8em',
+                    marginTop: '4px'
+                  }}
+                >
+                  {errors.weight}
+                </span>
+              )}
+            </div>
+
+            {/* Height */}
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                margin: '12px 0'
+              }}
+            >
+              <label
+                htmlFor="height"
+                style={{
+                  fontWeight: 700,
+                  color: 'darkgreen',
+                  fontSize: '.95em'
+                }}
+              >
+                Height (cm)
+              </label>
+              <input
+                type="number"
+                id="height"
+                value={formData.height}
+                onChange={handleChange}
+                min="1"
+                step="1"
+                style={inputStyle('height')}
+              />
+              {errors.height && (
+                <span
+                  style={{
+                    color: 'crimson',
+                    fontSize: '.8em',
+                    marginTop: '4px'
+                  }}
+                >
+                  {errors.height}
+                </span>
+              )}
+            </div>
+
+            {/* Activity */}
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                margin: '12px 0'
+              }}
+            >
+              <label
+                htmlFor="activity"
+                style={{
+                  fontWeight: 700,
+                  color: 'darkgreen',
+                  fontSize: '.95em'
+                }}
+              >
+                Activity Level
+              </label>
+              <select
+                id="activity"
+                value={formData.activity}
+                onChange={handleChange}
+                style={inputStyle('activity')}
+              >
+                <option value="">Select</option>
+                <option value="1.2">Sedentary (little exercise)</option>
+                <option value="1.375">
+                  Lightly active (1–3 days/week)
+                </option>
+                <option value="1.55">
+                  Moderately active (3–5 days/week)
+                </option>
+                <option value="1.725">Very active (6–7 days/week)</option>
+                <option value="1.9">
+                  Super active (physical job / athlete)
+                </option>
+              </select>
+              {errors.activity && (
+                <span
+                  style={{
+                    color: 'crimson',
+                    fontSize: '.8em',
+                    marginTop: '4px'
+                  }}
+                >
+                  {errors.activity}
+                </span>
+              )}
+            </div>
+
+            {/* Diet Type */}
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                margin: '12px 0'
+              }}
+            >
+              <label
+                htmlFor="dietType"
+                style={{
+                  fontWeight: 700,
+                  color: 'darkgreen',
+                  fontSize: '.95em'
+                }}
+              >
+                Diet Type
+              </label>
+              <select
+                id="dietType"
+                value={formData.dietType}
+                onChange={handleChange}
+                style={inputStyle('dietType')}
+              >
+                <option value="">Select</option>
+                <option value="veg">Vegetarian (Veg)</option>
+                <option value="nonveg">Non-Vegetarian (Non-Veg)</option>
+              </select>
+              {errors.dietType && (
+                <span
+                  style={{
+                    color: 'crimson',
+                    fontSize: '.8em',
+                    marginTop: '4px'
+                  }}
+                >
+                  {errors.dietType}
+                </span>
+              )}
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              style={{
+                width: '100%',
+                padding: '14px',
+                marginTop: '15px',
+                backgroundColor: 'orange'
+              }}
+            >
+              {loading ? 'Calculating...' : 'Generate Personalized Plan'}
+            </button>
+          </form>
+
+          {/* Result Card */}
+          <AnalysisResults metrics={metrics} />
+
+          {/* Button to go to meal plan (after metrics ready) */}
+          {metrics && (
+            <div style={{ textAlign: 'center', marginTop: '20px' }}>
+              <button
+                onClick={() => onNavigate('recommendations')}
+                style={{
+                  padding: '12px 20px',
+                  background: 'seagreen',
+                  borderRadius: '8px'
+                }}
+              >
+                Go to 7-Day{' '}
+                {metrics.dietType === 'veg' ? 'Veg' : 'Non-Veg'} Meal Plan
+              </button>
+            </div>
+          )}
+        </section>
+      );
+    };
+
+    // =========================================================
+    // 8. MEAL PLAN TABLE
+    // =========================================================
+
+    const MealPlanTable = ({ mealPlan }) => {
+      const tableStyle = {
+        width: '100%',
+        borderCollapse: 'collapse',
+        marginTop: '20px'
+      };
+      const thStyle = {
+        border: '1px solid lightgray',
+        padding: '10px',
+        textAlign: 'left',
+        backgroundColor: 'seagreen',
+        color: 'white',
+        fontSize: '.9em'
+      };
+      const tdStyle = {
+        border: '1px solid lightgray',
+        padding: '10px',
+        textAlign: 'left',
+        fontSize: '.9em'
+      };
+
+      if (!mealPlan || mealPlan.length === 0) {
+        return (
+          <div
+            style={{
+              textAlign: 'center',
+              color: 'gray',
+              padding: '20px'
+            }}
+          >
+            Use the <strong>Nutrient Analysis Hub</strong> first to generate
+            your 7-day meal plan.
+          </div>
+        );
+      }
+
+      return (
+        <table style={tableStyle}>
+          <thead>
+            <tr>
+              <th style={thStyle}>Day</th>
+              <th style={thStyle}>Breakfast</th>
+              <th style={thStyle}>Lunch</th>
+              <th style={thStyle}>Dinner</th>
+              <th style={thStyle}>Snack</th>
+              <th style={thStyle}>Focus</th>
+            </tr>
+          </thead>
+          <tbody>
+            {mealPlan.map((item, index) => (
+              <tr
+                key={index}
+                style={{
+                  backgroundColor: index % 2 === 0 ? 'whitesmoke' : 'white'
+                }}
+              >
+                <td style={tdStyle}>{item.day}</td>
+                <td style={tdStyle}>{item.breakfast}</td>
+                <td style={tdStyle}>{item.lunch}</td>
+                <td style={tdStyle}>{item.dinner}</td>
+                <td style={tdStyle}>{item.snack}</td>
+                <td style={tdStyle}>{item.focus}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      );
+    };
+
+    // =========================================================
+    // 9. HEADER, FOOTER, ABOUT, USER HOME, RECOMMENDATIONS
+    // =========================================================
+
+    const Header = () => (
+      <header
+        style={{
+          background: 'linear-gradient(135deg, black, darkslategray, teal)',
+          color: 'white',
+          textAlign: 'center',
+          padding: '60px 20px',
+          minHeight: '48vh',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          position: 'relative',
+          overflow: 'hidden'
+        }}
+      >
+        {/* Glowing background circle */}
+        <div
+          style={{
+            position: 'absolute',
+            width: '420px',
+            height: '420px',
+            background:
+              'radial-gradient(circle, lightgreen 0%, rgba(0,0,0,0) 70%)',
+            borderRadius: '50%',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            filter: 'blur(40px)',
+            zIndex: 0
+          }}
+        ></div>
+
+        {/* Main Title */}
+        <h1
+          style={{
+            fontFamily: "'Poppins', sans-serif",
+            fontSize: '3.8rem',
+            fontWeight: 800,
+            letterSpacing: '2px',
+            margin: 0,
+            textTransform: 'uppercase',
+            zIndex: 1,
+            textShadow:
+              '0 8px 28px rgba(0,0,0,0.8), 0 0 25px rgba(50,205,50,0.9)'
+          }}
+        >
+          Smart Nutrition Advisor
+        </h1>
+
+        {/* Underline glow */}
+        <div
+          style={{
+            width: '260px',
+            height: '6px',
+            marginTop: '18px',
+            background:
+              'linear-gradient(90deg, springgreen, paleturquoise, springgreen)',
+            borderRadius: '50px',
+            zIndex: 1,
+            boxShadow: '0 0 20px springgreen'
+          }}
+        ></div>
+
+        {/* Subtitle */}
+        <p
+          style={{
+            fontFamily: "'Roboto', sans-serif",
+            fontSize: '1.25rem',
+            marginTop: '25px',
+            opacity: 0.95,
+            maxWidth: '800px',
+            zIndex: 1,
+            textShadow: '0 4px 12px rgba(0,0,0,0.6)'
+          }}
+        >
+          AI-Powered Personalized Diet Planning &amp; Deep Nutrient
+          Deficiency Detection System
+        </p>
+      </header>
+    );
+
+    const Footer = () => (
+      <footer
+        style={{
+          background: 'black',
+          color: 'white',
+          padding: '28px',
+          marginTop: '40px',
+          textAlign: 'center',
+          fontSize: '.9em'
+        }}
+      >
+        &copy; 2025 Smart Nutrition Advisor · Built for healthier,
+        data-driven eating 🌿
+      </footer>
+    );
+
+    const AboutSection = () => (
+      <section
+        id="about"
+        style={{
+          maxWidth: '1100px',
+          margin: '25px auto',
+          padding: '60px 20px',
+          background: 'white',
+          borderRadius: '12px',
+          boxShadow: '0 10px 30px rgba(0,0,0,0.05)'
+        }}
+      >
+        <h2>About Smart Nutrition Advisor</h2>
+        <p
+          style={{
+            textAlign: 'center',
+            maxWidth: '820px',
+            margin: '0 auto',
+            fontSize: '.98em',
+            lineHeight: 1.6
+          }}
+        >
+          <strong>Smart Nutrition Advisor</strong> helps estimate your daily
+          calorie needs, understand your
+          <strong> macronutrient balance</strong>, and follow a personalized
+          <strong> 7-day Veg / Non-Veg meal plan</strong>. It uses the{' '}
+          <strong>Mifflin-St Jeor</strong> equation and supports projects
+          related to <strong>nutrition and food security</strong>.
+        </p>
+      </section>
+    );
+
+    const UserHome = ({ onNavigate }) => {
+      const { currentUser } = useAuth();
+      return (
+        <section
+          style={{
+            maxWidth: '1100px',
+            margin: '25px auto',
+            padding: '50px 20px',
+            background: 'white',
+            borderRadius: '12px',
+            boxShadow: '0 10px 30px rgba(0,0,0,0.05)'
+          }}
+        >
+          <h2>Your Nutrition Dashboard</h2>
+          <p
+            style={{
+              textAlign: 'center',
+              fontSize: '.98em',
+              marginBottom: '25px'
+            }}
+          >
+            Hi <strong>{currentUser?.name || 'there'}</strong> 👋 Use the tools
+            below to calculate your needs and view your 7-day plan.
+          </p>
+          <div
+            style={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: '20px',
+              justifyContent: 'center'
+            }}
+          >
+            <div className="card" style={{ flex: '1 1 260px', padding: '20px' }}>
+              <h3 style={{ marginTop: 0 }}>Step 1: Analyze</h3>
+              <p style={{ fontSize: '.9em', color: 'dimgray' }}>
+                Start with the <strong>Nutrient Analysis Hub</strong> to
+                calculate your daily calorie and macro targets.
+              </p>
+              <button
+                onClick={() => onNavigate('analysis')}
+                style={{ marginTop: '10px', padding: '10px 14px' }}
+              >
+                Open Analysis Hub
+              </button>
+            </div>
+            <div className="card" style={{ flex: '1 1 260px', padding: '20px' }}>
+              <h3 style={{ marginTop: 0 }}>Step 2: View Meal Plan</h3>
+              <p style={{ fontSize: '.9em', color: 'dimgray' }}>
+                After generating, explore your{' '}
+                <strong>7-day Veg / Non-Veg balanced meal plan</strong>.
+              </p>
+              <button
+                onClick={() => onNavigate('recommendations')}
+                style={{ marginTop: '10px', padding: '10px 14px' }}
+              >
+                View 7-Day Plan
+              </button>
+            </div>
+          </div>
+        </section>
+      );
+    };
+
+    const RecommendationsSection = ({ mealPlan }) => (
+      <section
+        id="recommendations"
+        style={{
+          maxWidth: '1100px',
+          margin: '25px auto',
+          padding: '60px 20px',
+          background: 'white',
+          borderRadius: '12px',
+          boxShadow: '0 10px 30px rgba(0,0,0,0.05)'
+        }}
+      >
+        <h2>2. Personalized 7-Day Meal Plan</h2>
+        <p
+          style={{
+            textAlign: 'center',
+            margin: '10px 0 20px',
+            fontSize: '.95em'
+          }}
+        >
+          This plan is generated according to your chosen{' '}
+          <strong>Veg / Non-Veg</strong> diet and BMI category.
+        </p>
+        <MealPlanTable mealPlan={mealPlan} />
+      </section>
+    );
+
+    // =========================================================
+    // 10. NAVBAR + APP ROUTING (HASH-BASED)
+    // =========================================================
+
+    const NavBar = ({ navigateTo }) => {
+      const { isAuthenticated, currentUser, logout } = useAuth();
+      const isAdmin = currentUser && currentUser.role === 'admin';
+
+      return (
+        <nav
+          style={{
+            background: 'forestgreen',
+            padding: '14px 18px',
+            display: 'flex',
+            alignItems: 'center',
+            position: 'sticky',
+            top: 0,
+            zIndex: 100
+          }}
+        >
+          <a
+            href="#about"
+            onClick={() => navigateTo('about')}
+            style={{ color: 'white', margin: '0 12px', fontWeight: 600 }}
+          >
+            About
+          </a>
+
+          {isAuthenticated ? (
+            <>
+              <a
+                href="#userHome"
+                onClick={() => navigateTo('userHome')}
+                style={{ color: 'white', margin: '0 12px', fontWeight: 600 }}
+              >
+                User Home
+              </a>
+              <a
+                href="#analysis"
+                onClick={() => navigateTo('analysis')}
+                style={{ color: 'white', margin: '0 12px', fontWeight: 600 }}
+              >
+                Analysis Hub
+              </a>
+              <a
+                href="#recommendations"
+                onClick={() => navigateTo('recommendations')}
+                style={{ color: 'white', margin: '0 12px', fontWeight: 600 }}
+              >
+                Meal Plan
+              </a>
+
+              {isAdmin && (
+                <a
+                  href="#admin"
+                  onClick={() => navigateTo('admin')}
+                  style={{
+                    color: 'gold',
+                    fontWeight: 700,
+                    textShadow: '1px 1px 2px black',
+                    marginLeft: '10px'
+                  }}
+                >
+                  Admin Panel
+                </a>
+              )}
+
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  marginLeft: 'auto',
+                  gap: '10px'
+                }}
+              >
+                <span style={{ color: 'honeydew', fontSize: '.9em' }}>
+                  Hi, {currentUser.name} 👋
+                </span>
+                <button
+                  onClick={logout}
+                  style={{
+                    background: 'crimson',
+                    padding: '7px 12px',
+                    fontSize: '.85em'
+                  }}
+                >
+                  Logout
+                </button>
+              </div>
+            </>
+          ) : (
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                marginLeft: 'auto',
+                gap: '15px'
+              }}
+            >
+              <a
+                href="#login"
+                onClick={() => navigateTo('login')}
+                style={{ color: 'white', fontWeight: 600 }}
+              >
+                Login
+              </a>
+              <a
+                href="#signup"
+                onClick={() => navigateTo('signup')}
+                style={{ color: 'white', fontWeight: 600 }}
+              >
+                Sign Up
+              </a>
+            </div>
+          )}
+        </nav>
+      );
+    };
+
+    const AppContent = () => {
+      const { isAuthenticated, isLoading, currentUser } = useAuth();
+      const [route, setRoute] = useState('about');
+      const [mealPlan, setMealPlan] = useState([]);
+
+      const navigateTo = newRoute => {
+        window.location.hash = newRoute;
+        setRoute(newRoute);
+      };
+
+      // Simple routing with window.location.hash
+      useEffect(() => {
+        const handleHashChange = () => {
+          if (isLoading) return;
+
+          const hash = window.location.hash.substring(1) || 'about';
+          let targetRoute = hash;
+
+          if (isAuthenticated) {
+            if (['login', 'signup', ''].includes(targetRoute)) {
+              targetRoute =
+                currentUser.role === 'admin' ? 'admin' : 'userHome';
+            } else if (
+              targetRoute === 'admin' &&
+              currentUser.role !== 'admin'
+            ) {
+              targetRoute = 'userHome';
+            }
+          } else {
+            if (
+              ['analysis', 'recommendations', 'admin', 'userHome'].includes(
+                targetRoute
+              )
+            ) {
+              targetRoute = 'login';
+              window.location.hash = 'login';
+            }
+          }
+          setRoute(targetRoute);
+        };
+
+        handleHashChange();
+        window.addEventListener('hashchange', handleHashChange);
+        return () => window.removeEventListener('hashchange', handleHashChange);
+      }, [isAuthenticated, isLoading, currentUser]);
+
+      const renderSection = () => {
+        if (isLoading) {
+          return (
+            <div style={{ textAlign: 'center', padding: '50px' }}>
+              Loading Application...
+            </div>
+          );
+        }
+
+        switch (route) {
+          case 'login':
+            return isAuthenticated ? (
+              <UserHome onNavigate={navigateTo} />
+            ) : (
+              <LoginPage onNavigate={navigateTo} />
+            );
+          case 'signup':
+            return isAuthenticated ? (
+              <UserHome onNavigate={navigateTo} />
+            ) : (
+              <SignupPage onNavigate={navigateTo} />
+            );
+          case 'admin':
+            return <AdminDashboard />;
+          case 'userHome':
+            return isAuthenticated ? (
+              <UserHome onNavigate={navigateTo} />
+            ) : (
+              <LoginPage onNavigate={navigateTo} />
+            );
+          case 'analysis':
+            return isAuthenticated ? (
+              <Calculator
+                setMealPlan={setMealPlan}
+                onNavigate={navigateTo}
+              />
+            ) : (
+              <LoginPage onNavigate={navigateTo} />
+            );
+          case 'recommendations':
+            return isAuthenticated ? (
+              <RecommendationsSection mealPlan={mealPlan} />
+            ) : (
+              <LoginPage onNavigate={navigateTo} />
+            );
+          case 'about':
+          default:
+            return <AboutSection />;
+        }
+      };
+
+      return (
+        <div>
+          <Header />
+          {/* Banner image strip */}
+          <div
+            style={{
+              backgroundImage:
+                "url('https://images.pexels.com/photos/1640772/pexels-photo-1640772.jpeg?auto=compress&cs=tinysrgb&dpr=3&h=720&w=1280')",
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              height: '320px',
+              width: '100%',
+              borderBottom: '4px solid seagreen'
+            }}
+          ></div>
+          <NavBar navigateTo={navigateTo} />
+          <main style={{ minHeight: '60vh' }}>{renderSection()}</main>
+          <Footer />
+        </div>
+      );
+    };
+
+    const AppWrapper = () => (
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
+    );
+
+    root.render(<AppWrapper />);
+  </script>
 </body>
 </html>
+
